@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#050505;font-family:'Inter',sans-serif;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px 0}
+.phone{width:370px;height:800px;background:#050505;border-radius:44px;overflow:hidden;position:relative;border:1.5px solid rgba(255,255,255,0.1);box-shadow:0 0 60px rgba(0,229,255,0.07),0 0 120px rgba(124,77,255,0.05),0 30px 80px rgba(0,0,0,0.9)}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;background:#050505;overflow:hidden}
+.screen.active{display:flex}
+.sb{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding-bottom:8px}
+.sb::-webkit-scrollbar{display:none}
+.bnav{flex-shrink:0;height:76px;background:rgba(5,5,5,0.97);border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-around;padding:0 8px 14px}
+.ni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:8px 18px;border-radius:14px;transition:all .2s;flex:1}
+.ni.on{background:rgba(0,229,255,0.07)}
+.ni-ic{font-size:20px}
+.ni-lb{font-size:9px;font-weight:700;color:rgba(255,255,255,0.3);letter-spacing:.8px}
+.ni.on .ni-lb{color:#00e5ff}
+
+/* SPLASH */
+#splash{align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#08001a 0%,#050505 65%)}
+.splash-logo{width:120px;height:120px;border-radius:28px;overflow:hidden;margin-bottom:20px;box-shadow:0 0 40px rgba(124,77,255,0.5),0 0 80px rgba(0,229,255,0.2);animation:logoP 2.5s ease-in-out infinite}
+.splash-logo img{width:100%;height:100%;object-fit:cover}
+@keyframes logoP{0%,100%{box-shadow:0 0 30px rgba(124,77,255,.4),0 0 60px rgba(0,229,255,.2)}50%{box-shadow:0 0 60px rgba(124,77,255,.8),0 0 100px rgba(0,229,255,.5)}}
+.splash-title{font-size:34px;font-weight:900;letter-spacing:7px;background:linear-gradient(135deg,#00e5ff 0%,#7c4dff 50%,#e040fb 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.splash-sub{font-size:11px;color:rgba(255,255,255,.3);letter-spacing:3.5px;margin-top:6px}
+.splash-ring{position:absolute;border-radius:50%;border:1px solid rgba(0,229,255,.1);animation:rExp 3s ease-in-out infinite}
+@keyframes rExp{0%{transform:scale(.8);opacity:.6}100%{transform:scale(2.8);opacity:0}}
+
+/* ONBOARD */
+.ob-inner{padding:56px 24px 32px;display:flex;flex-direction:column;gap:18px}
+.step-badge{font-size:10px;font-weight:700;letter-spacing:3px;color:#00e5ff;opacity:.7}
+.ob-title{font-size:24px;font-weight:800;line-height:1.25}
+.fl{font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.38);margin-bottom:7px}
+.pi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:13px;padding:13px 15px;color:#fff;font-size:15px;font-family:'Inter',sans-serif;outline:none;width:100%;transition:all .25s}
+.pi:focus{border-color:rgba(0,229,255,.45);background:rgba(0,229,255,.04)}
+.pi option{background:#0a0a0f}
+.og{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.oc{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px 12px;cursor:pointer;transition:all .22s;text-align:center;font-size:12px;font-weight:600;color:rgba(255,255,255,.55)}
+.oc:hover,.oc.sel{border-color:rgba(0,229,255,.5);background:rgba(0,229,255,.06);color:#00e5ff}
+.oc .oi{font-size:22px;margin-bottom:7px;display:block}
+.lo{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all .22s;display:flex;align-items:center;gap:12px}
+.lo:hover,.lo.sel{border-color:rgba(124,77,255,.5);background:rgba(124,77,255,.06)}
+.lo .li{font-size:22px}
+.lo .lt{font-size:13px;font-weight:700;color:#fff}
+.lo .ls{font-size:11px;color:rgba(255,255,255,.38);margin-top:2px}
+.nb{background:linear-gradient(135deg,#ff6d00,#ffd600);border:none;border-radius:15px;padding:15px;color:#1a0e00;font-size:14px;font-weight:900;cursor:pointer;width:100%;letter-spacing:1.5px;transition:all .25s;font-family:'Inter',sans-serif;box-shadow:0 0 18px rgba(255,109,0,.45),0 0 36px rgba(255,214,0,.18)}
+.nb:hover{box-shadow:0 0 26px rgba(255,109,0,.65),0 0 50px rgba(255,214,0,.3)}
+.nb:active{transform:scale(.98)}
+
+/* HEIGHT PICKER SCREEN */
+#heightPick{background:#050505}
+.hp-head{padding:24px 22px 10px;display:flex;align-items:center;gap:12px}
+.hp-back{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0}
+.hp-title{font-size:22px;font-weight:800}
+.hp-toggle{display:flex;background:rgba(255,255,255,.06);border-radius:40px;padding:3px;margin:0 22px 8px}
+.hp-tab{flex:1;padding:8px;border-radius:36px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;transition:all .25s;color:rgba(255,255,255,.4)}
+.hp-tab.on{background:#00e5ff;color:#050505}
+.hp-display{text-align:center;padding:10px 22px 8px}
+.hp-val{font-size:52px;font-weight:900;color:#00e5ff}
+.hp-unit{font-size:18px;font-weight:600;color:rgba(255,255,255,.5)}
+.hp-ruler{flex:1;position:relative;overflow:hidden;cursor:ns-resize;user-select:none}
+.hp-ruler-inner{position:absolute;left:0;right:0;transition:none}
+.ruler-line{position:absolute;right:22px;height:1px;border-radius:1px}
+.ruler-label{position:absolute;right:65px;font-size:11px;font-weight:700;color:rgba(255,255,255,.35);transform:translateY(-50%)}
+.ruler-center{position:absolute;left:0;right:0;top:50%;height:2px;background:linear-gradient(90deg,transparent,#00e5ff 30%,#7c4dff);z-index:5;pointer-events:none}
+.hp-figure{display:flex;justify-content:center;align-items:flex-end;padding:10px 0;background:radial-gradient(ellipse at 50% 80%,rgba(0,229,255,.06) 0%,transparent 60%)}
+.hp-figure svg{width:80px}
+.hp-next-btn{margin:10px 22px 12px;background:linear-gradient(135deg,#ff6d00,#ffd600);border:none;border-radius:16px;padding:16px;color:#1a0e00;font-size:15px;font-weight:900;cursor:pointer;width:calc(100% - 44px);font-family:'Inter',sans-serif;letter-spacing:1px;box-shadow:0 0 18px rgba(255,109,0,.45),0 0 36px rgba(255,214,0,.18)}
+
+/* AI LOADING */
+#aiLoad{align-items:center;justify-content:center;background:#050505}
+.al-avatar{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,rgba(0,229,255,.2),rgba(124,77,255,.2));border:2px solid rgba(0,229,255,.3);display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:20px;animation:logoP 2s infinite}
+.al-title{font-size:20px;font-weight:800;text-align:center;line-height:1.3;margin-bottom:28px}
+.al-ring{position:relative;width:120px;height:120px;margin-bottom:28px}
+.al-ring svg{transform:rotate(-90deg);width:120px;height:120px}
+.al-ring-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#00e5ff}
+.al-steps{width:100%;padding:0 32px;display:flex;flex-direction:column;gap:12px}
+.al-step{display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,.4)}
+.al-step.done{color:rgba(255,255,255,.8)}
+.al-step.active{color:#00e5ff}
+.al-check{width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.al-step.done .al-check{background:rgba(0,229,255,.2);border-color:#00e5ff;color:#00e5ff}
+.al-step.active .al-check{border-color:#00e5ff;animation:pulseRing .8s ease-in-out infinite}
+@keyframes pulseRing{0%,100%{box-shadow:0 0 0 0 rgba(0,229,255,.4)}50%{box-shadow:0 0 0 4px rgba(0,229,255,0)}}
+
+/* HOME - redesigned */
+.home-banner{position:relative;overflow:hidden;padding:20px 22px 20px;background:linear-gradient(135deg,rgba(0,229,255,.06) 0%,rgba(124,77,255,.08) 60%,rgba(224,64,251,.04) 100%);border-bottom:1px solid rgba(255,255,255,.05)}
+.home-banner::before{content:'';position:absolute;top:-40px;right:-30px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,255,.08) 0%,transparent 70%)}
+.home-banner-top{display:flex;justify-content:space-between;align-items:flex-start}
+.greet-col .greet-sm{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:1px;margin-bottom:3px}
+.greet-col .greet-big{font-size:22px;font-weight:900;background:linear-gradient(135deg,#fff,rgba(255,255,255,.8));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.home-date{font-size:10px;color:rgba(255,255,255,.35);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:4px 10px;margin-top:8px;display:inline-flex;align-items:center;gap:5px}
+.dpulse{width:5px;height:5px;border-radius:50%;background:#00e5ff;animation:dp 2s infinite;flex-shrink:0}
+@keyframes dp{0%,100%{opacity:1}50%{opacity:.3}}
+.streak-pill{background:linear-gradient(135deg,rgba(255,109,0,.15),rgba(255,214,0,.1));border:1px solid rgba(255,109,0,.25);border-radius:14px;padding:10px 14px;text-align:center}
+.streak-pill .sp-val{font-size:22px;font-weight:900;color:#ff9800}
+.streak-pill .sp-lbl{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:1px;margin-top:1px}
+
+/* QUOTE */
+.qcard{margin:12px 16px;background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(124,77,255,.08),rgba(224,64,251,.05));border:1px solid rgba(0,229,255,.14);border-radius:18px;padding:16px;position:relative;overflow:hidden}
+.qcard::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.5),rgba(124,77,255,.5),transparent)}
+.q-lbl{font-size:9px;font-weight:700;letter-spacing:2.5px;color:rgba(0,229,255,.6);margin-bottom:7px}
+.q-txt{font-size:14px;font-weight:800;line-height:1.4;background:linear-gradient(135deg,#fff,rgba(210,190,255,.9));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.q-auth{font-size:10px;color:rgba(255,255,255,.25);margin-top:5px;font-style:italic}
+.q-deco{position:absolute;bottom:-10px;right:12px;font-size:48px;opacity:.07}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;padding:0 16px;margin-top:12px}
+.sc{background:#0d0d15;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:12px 8px;text-align:center;position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.25),transparent)}
+.sc-ic{font-size:15px;margin-bottom:5px}
+.sc-val{font-size:18px;font-weight:900;color:#00e5ff}
+.sc-lbl{font-size:8px;color:rgba(255,255,255,.3);margin-top:2px;letter-spacing:.8px}
+
+/* PROGRESS CARD */
+.prog-row{padding:12px 16px 0}
+.prog-card{background:#0d0d15;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:14px;display:flex;align-items:center;gap:14px}
+.ring-wrap{position:relative;width:56px;height:56px;flex-shrink:0}
+.ring-wrap svg{transform:rotate(-90deg)}
+.ring-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#00e5ff}
+.ring-info .rv{font-size:20px;font-weight:900;color:#00e5ff}
+.ring-info .rl{font-size:9px;color:rgba(255,255,255,.32);letter-spacing:.8px;margin-top:2px}
+
+.sec-hdr{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 8px}
+.sec-title{font-size:15px;font-weight:800}
+.sec-badge{font-size:9px;font-weight:700;letter-spacing:.8px;color:#00e5ff;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);border-radius:20px;padding:4px 10px}
+
+/* WORKOUT CARDS - clean list style */
+.wcard{margin:0 16px 10px;background:#0d0d15;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s}
+.wcard:hover{border-color:rgba(255,214,0,.3);background:#101018}
+.wcard.done{border-color:rgba(0,230,118,.22);background:rgba(0,230,118,.03)}
+.wc-ic{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,rgba(255,109,0,.14),rgba(255,214,0,.1));border:1px solid rgba(255,214,0,.18);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.wcard.done .wc-ic{background:rgba(0,230,118,.12);border-color:rgba(0,230,118,.3)}
+.wc-mid{flex:1;min-width:0}
+.wc-name{font-size:14px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wc-muscle{font-size:11px;color:rgba(255,255,255,.38)}
+.wc-right{text-align:right;flex-shrink:0;display:flex;align-items:center;gap:8px}
+.wc-sets{font-size:15px;font-weight:900;color:#ffd600}
+.wc-sets-lbl{font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.5px}
+.wc-chev{font-size:16px;color:rgba(255,255,255,.25)}
+.wcard.done .wc-chev{color:#00e676}
+
+/* EXERCISE DETAIL SCREEN */
+#exDetail{background:#050505}
+.ed-head{padding:20px 18px 6px;display:flex;align-items:center;gap:12px}
+.ed-back{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0}
+.ed-head-title{font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.4)}
+.ed-hero{display:flex;flex-direction:column;align-items:center;padding:18px 22px 6px;text-align:center}
+.ed-ic{width:96px;height:96px;border-radius:26px;background:linear-gradient(135deg,rgba(255,109,0,.18),rgba(255,214,0,.12));border:1px solid rgba(255,214,0,.3);display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:14px;box-shadow:0 0 30px rgba(255,109,0,.18)}
+.ed-name{font-size:22px;font-weight:900}
+.ed-muscle{font-size:12px;color:#ffd600;margin-top:4px;letter-spacing:.5px}
+.ed-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;padding:18px 16px 0}
+.ed-stat{background:#0d0d15;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:12px 6px;text-align:center}
+.ed-stat-val{font-size:17px;font-weight:900;color:#ffd600}
+.ed-stat-lbl{font-size:8px;color:rgba(255,255,255,.32);margin-top:2px;letter-spacing:.6px}
+.ed-tip{margin:16px 16px 0;background:rgba(124,77,255,.08);border:1px solid rgba(124,77,255,.18);border-radius:13px;padding:13px 15px;font-size:12px;color:rgba(255,255,255,.55);line-height:1.5}
+.ed-tip b{color:#b39ddb;font-weight:700}
+.ed-actions{padding:18px 16px 10px;display:flex;flex-direction:column;gap:10px}
+.ed-tut-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,rgba(255,109,0,.16),rgba(255,214,0,.12));border:1px solid rgba(255,214,0,.4);border-radius:14px;padding:14px;font-size:13px;font-weight:800;color:#ffd600;cursor:pointer;letter-spacing:1px;text-decoration:none;box-shadow:0 0 16px rgba(255,109,0,.25);font-family:'Inter',sans-serif}
+.ed-done-btn{background:linear-gradient(135deg,#ff6d00,#ffd600);border:none;border-radius:14px;padding:15px;color:#1a0e00;font-size:14px;font-weight:900;cursor:pointer;letter-spacing:1.5px;font-family:'Inter',sans-serif;box-shadow:0 0 18px rgba(255,109,0,.45),0 0 36px rgba(255,214,0,.18)}
+.ed-done-btn.ok{background:linear-gradient(135deg,#00e676,#1de9b6);box-shadow:0 0 18px rgba(0,230,118,.4)}
+.tut-btn{background:linear-gradient(135deg,rgba(255,109,0,.18),rgba(255,214,0,.14));border:1px solid rgba(255,214,0,.45);border-radius:9px;padding:5px 10px;font-size:9px;font-weight:800;color:#ffd600;cursor:pointer;letter-spacing:.8px;transition:all .22s;font-family:'Inter',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:4px;box-shadow:0 0 10px rgba(255,109,0,.3)}
+.tut-btn:hover{background:linear-gradient(135deg,rgba(255,109,0,.3),rgba(255,214,0,.24));box-shadow:0 0 16px rgba(255,109,0,.5)}
+.done-btn{margin-left:auto;background:linear-gradient(135deg,rgba(255,109,0,.16),rgba(255,214,0,.12));border:1px solid rgba(255,214,0,.4);border-radius:9px;padding:6px 13px;font-size:10px;font-weight:800;color:#ffd600;cursor:pointer;letter-spacing:.8px;transition:all .22s;font-family:'Inter',sans-serif;white-space:nowrap;box-shadow:0 0 10px rgba(255,109,0,.28)}
+.done-btn:hover{box-shadow:0 0 16px rgba(255,109,0,.45)}
+.done-btn.ok{background:rgba(0,230,118,.1);border-color:rgba(0,230,118,.28);color:#00e676;box-shadow:none}
+.disclaimer{margin:10px 16px 4px;padding:10px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:11px;font-size:10px;color:rgba(255,255,255,.22);text-align:center}
+.ai-load-card{margin:0 16px 10px;background:#0d0d15;border:1px solid rgba(0,229,255,.12);border-radius:18px;padding:22px;text-align:center}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#00e5ff;margin:0 3px;animation:db 1.2s ease-in-out infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes db{0%,80%,100%{transform:scale(.6);opacity:.3}40%{transform:scale(1.1);opacity:1}}
+
+/* CONTACT */
+.contact-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 28px;background:radial-gradient(ellipse at 50% 50%,rgba(255,109,0,.06),transparent 65%)}
+.mega-btn{position:relative;width:100%;max-width:280px;padding:22px 28px;background:linear-gradient(135deg,#ff6d00,#ffd600);border:none;border-radius:22px;font-size:17px;font-weight:900;color:#1a0e00;letter-spacing:2.5px;cursor:pointer;font-family:'Inter',sans-serif;overflow:hidden;animation:oPulse 2.5s ease-in-out infinite;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:10px}
+@keyframes oPulse{0%,100%{box-shadow:0 0 30px rgba(255,109,0,.5),0 0 60px rgba(255,214,0,.2)}50%{box-shadow:0 0 60px rgba(255,109,0,.8),0 0 100px rgba(255,214,0,.4)}}
+.mega-btn::before{content:'';position:absolute;top:-50%;left:-60%;width:50%;height:200%;background:rgba(255,255,255,.22);transform:skewX(-25deg);animation:shine 3s ease-in-out infinite}
+@keyframes shine{0%{left:-60%}40%,100%{left:140%}}
+.mega-btn:hover{transform:translateY(-2px)}
+
+/* PROFILE */
+.p-hero{padding:20px 22px 18px;text-align:center;background:radial-gradient(ellipse at 50% 0%,rgba(124,77,255,.1),transparent 60%)}
+.av-wrap{position:relative;width:88px;height:88px;margin:0 auto 12px;cursor:pointer}
+.av{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,rgba(0,229,255,.28),rgba(124,77,255,.28));border:2px solid rgba(0,229,255,.35);display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 0 28px rgba(0,229,255,.2);overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.av-ol{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;flex-direction:column;gap:3px}
+.av-wrap:hover .av-ol{opacity:1}
+.av-ol span{font-size:16px}
+.av-ol p{font-size:9px;font-weight:700;color:#fff}
+.p-name{font-size:20px;font-weight:900}
+.p-goal{font-size:11px;color:#00e5ff;margin-top:4px}
+.p-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;padding:0 22px 14px}
+.ps{background:#0d0d15;border:1px solid rgba(255,255,255,.07);border-radius:15px;padding:14px 10px;text-align:center}
+.ps-val{font-size:20px;font-weight:900;color:#00e5ff}
+.ps-lbl{font-size:9px;color:rgba(255,255,255,.32);letter-spacing:.8px;margin-top:3px}
+.ach-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;padding:0 22px 14px}
+.ach{border-radius:14px;padding:14px 8px;text-align:center;transition:all .3s;position:relative;overflow:hidden}
+.ach::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;opacity:0;transition:opacity .3s}
+.ach.on::before{opacity:1}
+.ach[data-c="gold"]{background:rgba(255,214,0,.05);border:1px solid rgba(255,214,0,.12)}
+.ach[data-c="gold"].on{background:rgba(255,214,0,.1);border-color:rgba(255,214,0,.4);box-shadow:0 0 20px rgba(255,214,0,.15)}
+.ach[data-c="orange"]{background:rgba(255,109,0,.05);border:1px solid rgba(255,109,0,.12)}
+.ach[data-c="orange"].on{background:rgba(255,109,0,.1);border-color:rgba(255,109,0,.4);box-shadow:0 0 20px rgba(255,109,0,.15)}
+.ach[data-c="blue"]{background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1)}
+.ach[data-c="blue"].on{background:rgba(0,229,255,.09);border-color:rgba(0,229,255,.4);box-shadow:0 0 20px rgba(0,229,255,.15)}
+.ach[data-c="purple"]{background:rgba(124,77,255,.05);border:1px solid rgba(124,77,255,.12)}
+.ach[data-c="purple"].on{background:rgba(124,77,255,.1);border-color:rgba(124,77,255,.45);box-shadow:0 0 20px rgba(124,77,255,.18)}
+.ach[data-c="pink"]{background:rgba(224,64,251,.04);border:1px solid rgba(224,64,251,.1)}
+.ach[data-c="pink"].on{background:rgba(224,64,251,.09);border-color:rgba(224,64,251,.4);box-shadow:0 0 20px rgba(224,64,251,.15)}
+.ach[data-c="green"]{background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.1)}
+.ach[data-c="green"].on{background:rgba(0,230,118,.09);border-color:rgba(0,230,118,.4);box-shadow:0 0 20px rgba(0,230,118,.15)}
+.ach-ic{font-size:22px;margin-bottom:5px;filter:grayscale(1);opacity:.25;transition:all .3s}
+.ach.on .ach-ic{filter:none;opacity:1}
+.ach-nm{font-size:9px;font-weight:700;color:rgba(255,255,255,.25)}
+.ach.on .ach-nm{color:rgba(255,255,255,.75)}
+.info-rows{padding:0 22px 12px;display:flex;flex-direction:column;gap:8px}
+.ir{background:#0d0d15;border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:13px 15px;display:flex;justify-content:space-between;align-items:center}
+.ir-l{font-size:11px;color:rgba(255,255,255,.38)}
+.ir-v{font-size:13px;font-weight:600}
+.gb{margin:0 22px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,214,0,.25);border-radius:13px;padding:13px;color:rgba(255,255,255,.7);font-size:13px;font-weight:700;cursor:pointer;width:calc(100% - 44px);font-family:'Inter',sans-serif;transition:all .22s;box-shadow:0 0 10px rgba(255,109,0,.12)}
+.gb:hover{background:rgba(255,255,255,.07);box-shadow:0 0 16px rgba(255,109,0,.22)}
+.lb{color:rgba(255,80,80,.55);border-color:rgba(255,80,80,.12);margin-top:0}
+</style>
+</head>
+<body>
+<div class="phone">
+
+<!-- SPLASH -->
+<div class="screen active" id="splash">
+  <div class="splash-ring" style="width:280px;height:280px;top:50%;left:50%;margin:-140px 0 0 -140px"></div>
+  <div class="splash-ring" style="width:180px;height:180px;top:50%;left:50%;margin:-90px 0 0 -90px;animation-delay:1.2s"></div>
+  <div class="splash-logo">
+    <img id="brandLogoImg" src="" alt="Xd exercise">
+  </div>
+  <div class="splash-title">Xd exercise</div>
+  <div class="splash-sub">BECOME THE DESTROYER</div>
+</div>
+
+<!-- ONBOARDING -->
+<div class="screen" id="onboard">
+<div class="sb"><div class="ob-inner">
+  <div id="s1" style="display:flex;flex-direction:column;gap:16px">
+    <div class="step-badge">STEP 01 — IDENTITY</div>
+    <div class="ob-title">Who is the future Destroyer?</div>
+    <div><div class="fl">FIRST NAME</div><input class="pi" id="fn" type="text" placeholder="First name"></div>
+    <div><div class="fl">LAST NAME</div><input class="pi" id="ln" type="text" placeholder="Last name"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><div class="fl">AGE</div><input class="pi" id="age" type="number" placeholder="Years"></div>
+      <div><div class="fl">GENDER</div><select class="pi" id="gen"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><div class="fl">WEIGHT (KG)</div><input class="pi" id="wt" type="number" placeholder="kg"></div>
+      <div><div class="fl">HEIGHT (CM)</div>
+        <div onclick="openHeightPicker()" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:13px;padding:13px 15px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+          <span id="htDisplay" style="font-size:15px;color:rgba(255,255,255,.4)">Pick →</span>
+        </div>
+      </div>
+    </div>
+    <button class="nb" onclick="toS2()">CONTINUE →</button>
+  </div>
+  <div id="s2" style="display:none;flex-direction:column;gap:16px">
+    <div class="step-badge">STEP 02 — MISSION</div>
+    <div class="ob-title">What is your primary mission?</div>
+    <div class="og">
+      <div class="oc" onclick="selGoal(this,'Gain Muscle')"><span class="oi">💪</span>Gain Muscle</div>
+      <div class="oc" onclick="selGoal(this,'Lose Fat')"><span class="oi">🔥</span>Lose Fat</div>
+      <div class="oc" onclick="selGoal(this,'Body Recomp')"><span class="oi">⚡</span>Body Recomp</div>
+      <div class="oc" onclick="selGoal(this,'Lean Athletic')"><span class="oi">🏆</span>Lean Athletic</div>
+    </div>
+    <button class="nb" onclick="toS3()">CONTINUE →</button>
+  </div>
+  <div id="s3" style="display:none;flex-direction:column;gap:12px">
+    <div class="step-badge">STEP 03 — KNOWLEDGE</div>
+    <div class="ob-title">What do you want to learn while becoming the Destroyer?</div>
+    <div class="lo" onclick="selLearn(this,'Cyber Security')"><div class="li">🛡️</div><div><div class="lt">Cyber Security</div><div class="ls">Hack the system, build the body</div></div></div>
+    <div class="lo" onclick="selLearn(this,'Philosophy')"><div class="li">🌀</div><div><div class="lt">Philosophy</div><div class="ls">Forge mind and physique together</div></div></div>
+    <div class="lo" onclick="selLearn(this,'Psychology')"><div class="li">🧠</div><div><div class="lt">Psychology & Human Behaviour</div><div class="ls">Understand the game behind the game</div></div></div>
+    <div class="lo" onclick="selLearn(this,'None')"><div class="li">⚡</div><div><div class="lt">Just pure training</div><div class="ls">No distractions. Only gains.</div></div></div>
+    <button class="nb" onclick="toS4()">CONTINUE →</button>
+  </div>
+  <div id="s4" style="display:none;flex-direction:column;gap:14px">
+    <div class="step-badge">STEP 04 — ANALYSIS</div>
+    <div class="ob-title">Let the AI analyze your fitness level</div>
+    <div><div class="fl">WHAT IS YOUR FITNESS GOAL? (describe it)</div><textarea class="pi" id="goalDesc" rows="3" placeholder="e.g. I want to lose 10kg and get visible abs in 3 months..." style="resize:none;height:80px"></textarea></div>
+    <div><div class="fl">CURRENT FITNESS LEVEL</div>
+      <div class="og">
+        <div class="oc" id="lvl-easy" onclick="selLevel(this,'Easy')"><span class="oi">🌱</span>Easy</div>
+        <div class="oc" id="lvl-inter" onclick="selLevel(this,'Intermediate')"><span class="oi">⚡</span>Intermediate</div>
+        <div class="oc" id="lvl-hard" onclick="selLevel(this,'Hard')"><span class="oi">🔥</span>Hard</div>
+        <div class="oc" id="lvl-adv" onclick="selLevel(this,'Advanced')"><span class="oi">💀</span>Advanced</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><div class="fl">MAX PUSHUPS IN 1 SET</div><input class="pi" id="maxPush" type="number" placeholder="e.g. 15"></div>
+      <div><div class="fl">MAX SQUATS IN 1 SET</div><input class="pi" id="maxSquat" type="number" placeholder="e.g. 20"></div>
+    </div>
+    <div style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);border-radius:12px;padding:12px 14px;font-size:11px;color:rgba(255,255,255,.5);line-height:1.5">
+      🤖 <b style="color:#00e5ff">AI Trainer:</b> This data will be used to calibrate your exact starting point and build a personalized progression plan for you.
+    </div>
+    <button class="nb" onclick="finishOnboard()">GENERATE MY PLAN →</button>
+  </div>
+</div></div>
+</div>
+
+<!-- HEIGHT PICKER -->
+<div class="screen" id="heightPick">
+  <div class="hp-head">
+    <div class="hp-back" onclick="closeHeightPicker()">←</div>
+    <div class="hp-title">What's your height?</div>
+  </div>
+  <div class="hp-toggle">
+    <div class="hp-tab on" id="tab-cm" onclick="setUnit('cm')">cm</div>
+    <div class="hp-tab" id="tab-ft" onclick="setUnit('ft')">ft</div>
+  </div>
+  <div class="hp-display">
+    <span class="hp-val" id="hpVal">170</span>
+    <span class="hp-unit" id="hpUnit">cm</span>
+  </div>
+  <div class="hp-figure">
+    <svg viewBox="0 0 80 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="22" r="14" fill="#1a1a35" stroke="#7c4dff" stroke-width="1.5"/>
+      <circle cx="40" cy="22" r="10" fill="#252545"/>
+      <circle cx="35" cy="20" r="2" fill="#00e5ff"/>
+      <circle cx="45" cy="20" r="2" fill="#00e5ff"/>
+      <path d="M35 27 Q40 31 45 27" stroke="#00e5ff" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      <rect x="26" y="36" width="28" height="55" rx="10" fill="#1a1a35" stroke="#7c4dff" stroke-width="1"/>
+      <rect x="28" y="38" width="24" height="51" rx="8" fill="#252545"/>
+      <path d="M26 50 L10 60 L12 80 L20 75 L22 90" stroke="#b39ddb" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <path d="M54 50 L70 60 L68 80 L60 75 L58 90" stroke="#b39ddb" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <path d="M32 91 L28 130 L32 155 L40 152 L48 155 L52 130 L48 91" fill="#252545" stroke="#7c4dff" stroke-width="1"/>
+      <line x1="40" y1="0" x2="40" y2="160" stroke="url(#vg)" stroke-width="1" opacity="0.15"/>
+      <defs><linearGradient id="vg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#00e5ff"/><stop offset="1" stop-color="#7c4dff"/></linearGradient></defs>
+    </svg>
+  </div>
+  <div class="hp-ruler" id="rulerArea">
+    <div class="ruler-center"></div>
+    <div id="rulerInner" class="hp-ruler-inner"></div>
+  </div>
+  <button class="hp-next-btn" onclick="confirmHeight()">CONFIRM HEIGHT →</button>
+</div>
+
+<!-- AI LOADING -->
+<div class="screen" id="aiLoad">
+  <div class="al-avatar">🤖</div>
+  <div class="al-title">Generating your<br>personalized plan...</div>
+  <div class="al-ring">
+    <svg viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+      <circle id="alCircle" cx="60" cy="60" r="50" fill="none" stroke="url(#alg)" stroke-width="8" stroke-linecap="round" stroke-dasharray="314.2" stroke-dashoffset="314.2"/>
+      <defs><linearGradient id="alg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#7c4dff"/></linearGradient></defs>
+    </svg>
+    <div class="al-ring-val" id="alPct">0%</div>
+  </div>
+  <div class="al-steps">
+    <div class="al-step" id="als1"><div class="al-check"></div>Analyzing your body metrics...</div>
+    <div class="al-step" id="als2"><div class="al-check"></div>Calibrating fitness level...</div>
+    <div class="al-step" id="als3"><div class="al-check"></div>Selecting optimal exercises...</div>
+    <div class="al-step" id="als4"><div class="al-check"></div>Building progression plan...</div>
+    <div class="al-step" id="als5"><div class="al-check"></div>Finalizing your schedule...</div>
+  </div>
+</div>
+
+<!-- EXERCISE DETAIL -->
+<div class="screen" id="exDetail">
+<div class="sb">
+  <div class="ed-head">
+    <div class="ed-back" onclick="closeExDetail()">←</div>
+    <div class="ed-head-title">EXERCISE DETAIL</div>
+  </div>
+  <div class="ed-hero">
+    <div class="ed-ic" id="edIc">💪</div>
+    <div class="ed-name" id="edName">Push Ups</div>
+    <div class="ed-muscle" id="edMuscle">Chest</div>
+  </div>
+  <div class="ed-stats">
+    <div class="ed-stat"><div class="ed-stat-val" id="edSets">5×32</div><div class="ed-stat-lbl">SETS×REPS</div></div>
+    <div class="ed-stat"><div class="ed-stat-val" id="edRest">25s</div><div class="ed-stat-lbl">REST</div></div>
+    <div class="ed-stat"><div class="ed-stat-val" id="edCal">40</div><div class="ed-stat-lbl">KCAL</div></div>
+  </div>
+  <div class="ed-tip"><b>💡 Tip:</b> <span id="edTip">Keep elbows at 45°.</span></div>
+  <div class="ed-actions">
+    <a class="ed-tut-btn" id="edTutBtn" href="#" target="_blank">▶ WATCH TUTORIAL</a>
+    <button class="ed-done-btn" id="edDoneBtn" onclick="markDoneFromDetail()">MARK AS DONE</button>
+  </div>
+</div>
+</div>
+
+<!-- HOME -->
+<div class="screen" id="home">
+<div class="sb">
+  <div class="home-banner">
+    <div class="home-banner-top">
+      <div class="greet-col">
+        <div class="greet-sm">WELCOME BACK,</div>
+        <div class="greet-big" id="hGreet">DESTROYER</div>
+        <div class="home-date"><div class="dpulse"></div><span id="hDate">Today</span></div>
+      </div>
+      <div class="streak-pill">
+        <div class="sp-val" id="hStreakBig">0</div>
+        <div class="sp-lbl">🔥 STREAK</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard">
+    <div class="q-lbl">DAILY FUEL</div>
+    <div class="q-txt" id="qTxt">We train to destroy.</div>
+    <div class="q-auth" id="qAuth">— Xd exercise</div>
+    <div class="q-deco">🔥</div>
+  </div>
+  <div class="stats-row">
+    <div class="sc"><div class="sc-ic">⚡</div><div class="sc-val" id="hCal">0</div><div class="sc-lbl">KCAL</div></div>
+    <div class="sc"><div class="sc-ic">🏆</div><div class="sc-val" id="hTotal">0</div><div class="sc-lbl">WORKOUTS</div></div>
+    <div class="sc"><div class="sc-ic">📅</div><div class="sc-val" id="hDays">0</div><div class="sc-lbl">DAYS IN</div></div>
+  </div>
+  <div class="prog-row">
+    <div class="prog-card">
+      <div class="ring-wrap">
+        <svg width="56" height="56" viewBox="0 0 56 56">
+          <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
+          <circle id="pCircle" cx="28" cy="28" r="22" fill="none" stroke="url(#pg)" stroke-width="4" stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="138.2"/>
+          <defs><linearGradient id="pg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#7c4dff"/></linearGradient></defs>
+        </svg>
+        <div class="ring-val" id="pPct">0%</div>
+      </div>
+      <div class="ring-info"><div class="rv" id="pComp">0/0</div><div class="rl">COMPLETED TODAY</div></div>
+    </div>
+  </div>
+  <div class="sec-hdr"><div class="sec-title">Today's Workout</div><div class="sec-badge" id="diffBadge">Week 1 · Easy</div></div>
+  <div id="wList"><div class="ai-load-card"><div><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><div style="font-size:11px;color:rgba(255,255,255,.38);margin-top:10px">AI generating your personalized workout...</div></div></div>
+  <div class="disclaimer">⚠ Workouts refresh at 12:00 AM · Never break your streak</div>
+</div>
+<div class="bnav">
+  <div class="ni on" id="nh" onclick="goTo('home')"><div class="ni-ic">🏠</div><div class="ni-lb">HOME</div></div>
+  <div class="ni" id="nc" onclick="goTo('contact')"><div class="ni-ic">💬</div><div class="ni-lb">CONTACT</div></div>
+  <div class="ni" id="np" onclick="goTo('profile')"><div class="ni-ic">👤</div><div class="ni-lb">PROFILE</div></div>
+</div>
+</div>
+
+<!-- CONTACT -->
+<div class="screen" id="contact">
+  <div class="contact-body">
+    <img class="brand-logo-sm" style="width:64px;height:64px;border-radius:18px;animation:logoP 3s infinite;margin-bottom:16px;object-fit:cover" id="brandLogoImgContact" src="" alt="Xd exercise">
+    <div style="font-size:22px;font-weight:900;margin-bottom:6px">Contact To Admin</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.38);margin-bottom:44px;text-align:center;line-height:1.6">Admin have some anger issue's,<br>Text on you'r risk</div>
+    <a class="mega-btn" href="https://www.instagram.com/oxd94h/" target="_blank"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;filter:drop-shadow(0 0 4px rgba(0,0,0,.5))"><rect x="2" y="2" width="20" height="20" rx="6" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="12" cy="12" r="4.6" stroke="#fff" stroke-width="1.8" fill="none"/><circle cx="17.2" cy="6.8" r="1.15" fill="#fff"/></svg>&nbsp;CONTACT US</a>
+    <div style="font-size:11px;color:rgba(255,255,255,.2);margin-top:14px">@oxd94h on Instagram</div>
+  </div>
+  <div class="bnav">
+    <div class="ni" id="nh2" onclick="goTo('home')"><div class="ni-ic">🏠</div><div class="ni-lb">HOME</div></div>
+    <div class="ni on" id="nc2" onclick="goTo('contact')"><div class="ni-ic">💬</div><div class="ni-lb">CONTACT</div></div>
+    <div class="ni" id="np2" onclick="goTo('profile')"><div class="ni-ic">👤</div><div class="ni-lb">PROFILE</div></div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="screen" id="profile">
+<div class="sb">
+  <div class="p-hero">
+    <div class="av-wrap" onclick="document.getElementById('avInput').click()">
+      <div class="av" id="avEl"><img class="brand-logo-sm" style="width:100%;height:100%;object-fit:cover" id="brandLogoImgAv" src="" alt="Xd exercise"></div>
+      <div class="av-ol"><span>📷</span><p>CHANGE PHOTO</p></div>
+    </div>
+    <input type="file" accept="image/*" id="avInput" style="display:none" onchange="handleAvUpload(event)">
+    <div style="font-size:10px;color:rgba(0,229,255,.5);margin-bottom:8px;letter-spacing:.5px">TAP TO CHANGE PHOTO</div>
+    <div class="p-name" id="pName">DESTROYER</div>
+    <div class="p-goal" id="pGoal">Gain Muscle</div>
+  </div>
+  <div class="p-stats">
+    <div class="ps"><div class="ps-val" id="ppStreak">0</div><div class="ps-lbl">STREAK</div></div>
+    <div class="ps"><div class="ps-val" id="ppTotal">0</div><div class="ps-lbl">WORKOUTS</div></div>
+    <div class="ps"><div class="ps-val" id="ppDays">0</div><div class="ps-lbl">DAYS</div></div>
+  </div>
+  <div class="sec-hdr"><div class="sec-title">Achievements</div><div class="sec-badge" id="achBadge">0 Unlocked</div></div>
+  <div class="ach-grid">
+    <div class="ach" id="a1" data-c="gold"><div class="ach-ic">🥇</div><div class="ach-nm">First Rep</div></div>
+    <div class="ach" id="a7" data-c="orange"><div class="ach-ic">🔥</div><div class="ach-nm">7 Day Streak</div></div>
+    <div class="ach" id="a15" data-c="blue"><div class="ach-ic">⚡</div><div class="ach-nm">15 Day Streak</div></div>
+    <div class="ach" id="a30" data-c="purple"><div class="ach-ic">👑</div><div class="ach-nm">30 Day Streak</div></div>
+    <div class="ach" id="a50" data-c="pink"><div class="ach-ic">💎</div><div class="ach-nm">50 Workouts</div></div>
+    <div class="ach" id="a100" data-c="green"><div class="ach-ic">🏅</div><div class="ach-nm">100 Workouts</div></div>
+  </div>
+  <div class="sec-hdr" style="padding-top:6px"><div class="sec-title">Personal Info</div></div>
+  <div class="info-rows">
+    <div class="ir"><div class="ir-l">Age</div><div class="ir-v" id="pAge">—</div></div>
+    <div class="ir"><div class="ir-l">Height</div><div class="ir-v" id="pHt">—</div></div>
+    <div class="ir"><div class="ir-l">Weight</div><div class="ir-v" id="pWt">—</div></div>
+    <div class="ir"><div class="ir-l">Gender</div><div class="ir-v" id="pGen">—</div></div>
+    <div class="ir"><div class="ir-l">Fitness Level</div><div class="ir-v" id="pLevel">—</div></div>
+    <div class="ir"><div class="ir-l">Max Pushups</div><div class="ir-v" id="pPush">—</div></div>
+    <div class="ir"><div class="ir-l">Learning</div><div class="ir-v" id="pLearn">—</div></div>
+  </div>
+  <button class="gb" onclick="alert('Edit Profile — Full build feature 🔒')">Edit Profile</button>
+  <button class="gb lb" onclick="doLogout()">Logout</button>
+</div>
+<div class="bnav">
+  <div class="ni" id="nh3" onclick="goTo('home')"><div class="ni-ic">🏠</div><div class="ni-lb">HOME</div></div>
+  <div class="ni" id="nc3" onclick="goTo('contact')"><div class="ni-ic">💬</div><div class="ni-lb">CONTACT</div></div>
+  <div class="ni on" id="np3" onclick="goTo('profile')"><div class="ni-ic">👤</div><div class="ni-lb">PROFILE</div></div>
+</div>
+</div>
+
+</div>
+<script>
+const G={get(k){try{return JSON.parse(localStorage.getItem('gg4_'+k))}catch(e){return null}},set(k,v){try{localStorage.setItem('gg4_'+k,JSON.stringify(v))}catch(e){}}};
+const BRAND_LOGO="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAcFBQYFBAcGBgYIBwcICxILCwoKCxYPEA0SGhYbGhkWGRgcICgiHB4mHhgZIzAkJiorLS4tGyIyNTEsNSgsLSz/2wBDAQcICAsJCxULCxUsHRkdLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCz/wAARCADwAPADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD5tooq7punPfTqCH8vcF+RdzMx6Ko7k0AV7e1munKxJuxyxPAUepPQVq22jIV37WucdWB8uL/vo8t+AFbt5bWXh63WO+SOS4HzLZI2UiPq5/ib9K5rUNaub5yWbavZV4AqrW3GXH8u24WSGL2ijGf++jk1Va/kQ4S7uMe0pH8qzCzMeSTRj1oA0f7Ul73Fyf8Ats3+NKNUb/ntc/8Af5v8azsD1owPX9KpNhc0xqpH/LW5/wC/7/407+1j/wA9bn/v+/8AjWVj3pQtUpPsvuQ7mr/aoPWS5/7/AL/40v8Aaif37j/v+/8AjWUF96XZ71opPsvuQczNUapH3a4/8CH/AMak/taL1uP/AAIf/GsfZ7/pS7B6/pWicuy+5D5n2NgavD/08f8AgQ/+NH9rQelx/wCBL/41kCP3/Sl8r3/SrXN/KvuQ7vsbH9r2/dbg/wDbzJ/jR/bFsOsc5/7eZP8AGsfyx/e/SkKD1/Sk3JdF9yFdm0Nctgf+PeU/9vUn+NL/AG/a/wDPpKf+3uX/ABrCMY9f0ppUev6Vk5yXRfchcxv/APCQWgH/AB5SH/t7l/xpV8SWa9dPdv8At8lH/s1c9tHr+lJgetT7WXZfcv8AIVzp18U6eOukuf8At+m/xqRfFunL/wAwQn638/8A8VXKYHrRgetT7WXZfcv8hHW/8JRo042zaVdRKf8AnlfyH9GNMI0C+GIryaFj0W8jWQf99DB/WuUxRyKPa3+KK+635Abl5oKxKZAQiHpLGfMi/H+JfxzWRc2k1owEq/K3KuDlWHsaltNRuLRsxyED07Vox3cVxGwSNMNzJA33H9x/dPuKlxjLWP3AYdFXL2yWFRPbsz27HHzD5kb+63+PeqdZAS21u1zcLEpC55LHoo7mu3guYfCmiJeIo/tC4QrbK3PkRnq/++3r2HFYXh6zRyryj5HJd/8Armvb8W/lVHW9RfUdRklY8Zwo9BVLTUa0KdxcyXMzSSMWZjkknk1HjuaAOMmjqeaQgz6cCiijFMApwoxS4qkgExTgKcq5qaKBpCABmumnScnZFKLZEFJqWO3dzhVJr0TwT8ItZ8Uqt06ix0/vcTDG4f7I7/y9627zXfBXgq3nt/DliNV1OLCi+u0DIGzyVXp64P8AOvVpYFL43/wPXt+fkdUcP1locRonw58Sa4iSWmmS+S5wJZcRof8AgTYBreT4Z6bp/mDXfFml2Tx5zFCxuHOOowvftWNr3jTXfE13C99eO3lodiJ8qqOScAcdKoWWk6hqkIeCGWZ5ZCqhQSTgZY/qPzrup0aSdoK/9ef+RolTWiVzpl0n4c20G+bVdZu5N23ZDbpHkeuWY8U823w4JVEg8QF2H9+Lj9Kqto+gaJqMZ1bVY7tIMbrey/es7YyctwoGfcnHaoF8WaRp5m/s/QI5nmUq0t9M0jEE5OAm0DP8uK6rUofGa3hH4rGonhnwJqLyLa6zqtoqDJlntFdAPUlWB/Sq0vwte+gM2g61p2qpnATeYJCfQLIBk+wJrMbx9qCwG3hstMggLb/LWzQjOMZ+YEmj/hYWqP5YmttOmWJdqA2iLtHttAxWE54WWj/r8F+ZDnQe5gatoGo6LdNb6hZzWsq9UlQqay2UivQT8Q21G3+yaxa/abY8bGcuE913ZK/gRXN6vp1rsN3p0vnWpPIP3o/Yj+tcVfAwnBzoO9uhhUoxa5qbuc+RTSKlYYphrwJRscYw0lPptZsYlGaKKQARSxyNGwKnGKSgikBrwSiWNnC79y7ZY/76/wCIrNurf7NOUB3IRuRv7ynoafZXBt7hTnjvVvUo1CbQOB+8jP8Asn7w/A8/iap6q4F8uLPRrgqeSRAPoo5/Umud+831rX1Sb/QLdBxv3SEfViayBwD+VSAHk0UUUwFApaBTsVolcBAKkVcmhV5rQ06wlvLhIokZ2chQAMkk12UKEqslFI1hBydkO03S7jULlILeJpZJCFVVGSSewFe3+CvhZZ+F7GbxF42RIoLbmO2chsnsWA689F/Or/h7SNL+FOkQXepLHJ4huY/MKkBvscXc4/vHoPUnHQGvPPHfxKv/ABXdSeYzRW6fJDbocqo7knu3A5x+VfQU6MacdNI9ZdX/AIf8/wCn6cKcaau/v/y/zND4nePtRv8AxJeQ6ffPDptswt4o4SVVgFILYH1NecTsqtdRlsHcNvuM1Xe9d4pI2AbzGDZPUEZ/xqDcztySSa4quKikow2OOrWT2N7SvsrzNLPJ5Uaw7GOMk8bcAdya1LjXkNh/Z8H2iHT1OfIjcLvJ7u2MsePpxwK5u1iLMF+9gZIBwB7k9q17W6t41k228cuxGYu6kgYHYH3xz79K7aFVuOtkciqtDVl08lVGkIx7753P8iMVKf7FkX5tMmjycIYZyS34MDWUurzKSDHAQc5zGOamXV0b79rGp27Q0bFSB7ZyKhYqm+33FLENdvuLzaDpl46x2WpeVM3Aiuk28+m5cj88Vl6noN/pMuy7t2jz91uqt9CODV6CWzcKkE7W5I+cuOT7Bhx/KtSxv57CMwzRo1jIfminy4cew7H3Fa+xo1ltbzRftKU9JKxxZUinRzyQsSpxkYI7EehrrNZ8OQy2J1XSRI1pnEkbj54T7+q+hrlJIipwRXl16FTDSumYzTpsrtyTUZFTMuKjIryp7mdyMim1IRTCKxaKG4pKdSVI7iUUUUhh0NazkT6IJOrQtg/Q8H+lZPatfR1NxbXVt3aI4+o5oAg1bg2y+kK1Q/hFX9Y/11v/ANcEqgfurQgEpQKAKcKpIAAzUiCprOynvbhYbeJ5ZDztUZ47n6CtKU6VpEahl/tG86sNxWFPT3b9PxrqhCy5pbGkY9WUIot3avVPg5Ja2er3N5NFGklpGJRdTLuSBdwDNjpkg4BPSvKJtWup3OwrCv8AciUKP061atfEOrWGm3FlDdyJBcENIgP38dM+or0MPjaNO6afqb068ab2O/8AG19YzzDULvWF1S9vXMs3kMSFA4WMeg9/oAK4O6vfNL+VbrEG79SB6e1Q2M8c1yjSgnDAsgPLDvj3rb8V6vpGoG2i0XT/ALDbRJ84Y7pHfuWP8q76mK9vSc4ysl00v/wPkXPEe1Ta0t06nNU9PvAZxTetSLHujZh/DzXhJts86TLTzolstvCc5O6RvU9gPYVcBEFiYJGKyz4zxyi9QD9Tz+ArKjleNsocEd6duZmLMSSeSSetdcMRbX5eVjNkk1tJCRkZU9GHINRgEVZguGjOMhl7q3IP4VZ+xpcgG3BDnkxnp+Bzz9KqNFVNaf3CuZ4JFX7HUp7NhsYFP7jDI/8ArH3FVWiZGIYEEdQabgg0oSnSldaEtndaDeoLhbuyiM5VcTwSyZLKeCP9pf5VQ8YeHo9OnivLMFrC9XzID1K88ofdTxWDp95NZ3Uc0LlJEOQRXrFjaReLvh9qEcSgy24+1RxjnypFHzqP9llyw91I7V7cKkcTS5Z7mftnD3JbdDxWRMGoWWtG7g8uUqR0qky189Wp8raZrGVyBhUZFTMKjIriaNEyMikNPIpprNosbSU6kNSMOxra8KjdqbDsYzWKOhra8K/8hbH+waQ0VNW/1lt/1wSqJ+6v0q9q4xJbf9e6VS/hX6f1oQCCpYozI4VQSScADvTFHNdH4U09ZruW/m/49tPT7RJz97H3V/E4H412UKXtJWNacOd2E1Ur4e05tLQ/6bMqtdMGPy85EY7Yxgn3PtXMkl2LE5JOasaheS39/LdTMXklYuxJzknmoFwoyayxFTnnaOyFUkm9NiSPCHJHPaphD5vztgD61Csq7gx60puC3GaxTMhZFVW+QjIq7cIZbaG6Cj5/kcjuw7/iP5Gs/knNbNopm0K4jPzeW6yLj8Qf5iuqgua8fI56suSz8/zM4CrUaFbSR/72FH51PHproA05EakZAPUj6Vcaxaa3QQqWXPTvmu2lh56toJTRigU9VrW/4R7UNm8Wc5X18s4qu1hNE2HjZT6EYqFQmuhDqR7lUDFWIH2OpIyPSlS0lc/KpNTiwmHVTXRTpzTukZSqxW7NRbWPU4myf3/RJD0YY4Df41mT6ZPCAXjZc56itDTS0ExWRSY2GCD9eK6eLV7C48P+Td2wbbJjg/MuR94flX0MaFLFQUp6SM1WUnZs4ARsjcivQvhR4hXRPFtulww+yXf+jzq3Ta3GfwJ/nVOTR9DuX2w6gYSenmJwfxFKfBmpwR/arFVvYl+bfbNvx9QORWKwLpNpu6ZnVldWZg+LrD+z/EN9aY/1Ezx/kxFc04rp/FNxLqOs3N2ysDM5c5Hc9f1zXNyKQa8rHRftG2bUJe6isRUZFTMKjYV5EkdiZERTTUhFMIrBotDKQ040hqGUhB0NbnhIZ1j/AICawx0NbnhL/kMf8BqWUilq/wDrLb/rglUv4F+n9au6v/rLb/r3SqX8K/5704gOXrXY+Hngl8GeILMOhvJki8mIn5pMNk7fUj0rjAanileNgyMVYdCDg124eryN+ZvTnyskGj38lus62svls/lbtpA3Y6Z9a7fwh8N1vWW51Z8R8FYl6nnJz6cDH41qeBbldU8B65plxktbzRX0T9SGyEOfr8orq9GAtoB50io3JOTwo9TWGNo+yUZR6nVHDxspnN/EH4daRZ6Td6npaSQyxYkKBhsIJ54/GvKILbeAT0NfSEfizwZdQQxJrYnuj8rRpE7rntzjH61s6t4b0PUvCUkepuiQzJuj8sDejDoQPUVxRk1uYzpqWsTwjw5p0GnaRPr9zbW1xg+RbJcqGjV8gNIwPB2g8A5GevStDWfDcsz21/ockN4s2WL26LGGTjDtGAAGB3KcDHyg4qx4b1aGbS9c8JeTH/G0LXHJU9GYHI2kYU9fWtnRb2zh8eWWlWcgeGK0YXJRxIoc443Dg88n3fHatI1JQlzIzdKM4crLFl4L0mDW/O1k6jqUYXcohCRpIf7pOdyD6D6GvSNNeCzgVNLsrPSoiOFtoRv/ABc5Yn8am0+Oxjs2t9QiO63bEUg64PQGqNxdWsMp8qUBe2e1a1cZUqatl06EY76s37Oxu9TkKLNczEdS0xAH61Dq3hW2gAOoxR3SN/BMwcH884rGj1xIm/dztvHdM8fjRFe3PiKRzBcBVB2PcyEsB7DHUiohXnHVMVShGekloZWpSaP4duo00DQrIu5w0c0SzMD6h2zgfhVs2d5qkSm9azRW/hS2jP67afc6Hp2k6lBb+eL6ec5MzdFHcAV1Om6Qs0e5IswocNsGSvvjvXXHG1L7nFLA0VHYxIvhRo+qWhf92shGfMtXxt+qHj+VeeeNvhhqfhWB7iMfabJzjzUB+X2Ydv5V7FfaZPpkqyxO0L9UkQ8GqcHi/wCzu1pq0Qmsp8xzAjIjz3A7r6j8vSvWoY6rfe67dfkzw62D9l70ND5dmmkhbZkjBqxp/iC+06dZra5khkXoyMVNdd8UvBq6Dr7tYruspgJIyvIAPI59PT8u1edSRshwciumdepB80XozSlKNWOu56VaeMNH8SRi18U2S+YRtXULVQkqf7w6OP1rD8VeBp9IiW+tJUv9MmP7q7h5U+x/un2NcikjKeDXWeFvGNzokjwyKt1YTjbPay8pIPp2Poa0hWhXXLP+v8vy/Ml05UnzU/uOLliKkgioGWvQvFnhm1Nmut6Kxl0yc4Kn70Df3G/oe9cHLGVJrzsVhnSfkd1Gqpq5VPQ1GRUzDFMIry5I6kyI02pXRkbDKQcZwajNZNFoTsa2/CIzrGP9k1idjW54S41fP+yazZSKOsf6y1/690ql/CtXtY/1lr/17pVE/dX6f1oQwFOWmingVvEaNzQNevtGedbOURi6j8qUFQwZcg459wD+Fd1rXgzxB4gsILqz1EyW9yibrfdsA+RTkjoRz+leZ2ykyKAMmvdLDxHp3hTwVCuqebLdJEhEUXLY5JU/3TjFehVpuphXK2qZ6NJc9NqRzng3Sl8P3UkWqWsJkiykcoTdxnJOex7dBxXU654gjuglvGwCHgnHAWuPXx94fuke7lnmtZXkJ+zlDIFXPA3VW1zXtPl0yO8065jdSSGHQ/QjqK+fabeolKEVaLOW127Fj4pn1KzYFlm3DsCMYIPqDzXYfC9NOBnnjg2zSqVBJ6Lu7fiB+VeWXNw1xKSSSO2a9C8MZ0rTrO8V/VXX0BPX8/51o1oc1N3lc9wtPL1yxa1Z0kk2bGw2Cfb2PpXmfiaDXfCd4wZp57Yk7JQMnHoQe/0q82oBLtDDN5E843RSA/xDqDVm0+I2o3Gof8I7r+k/2hJJ8gjZd24eoccjjnJqEjokzgF8Tal4g1SDTvPnIlcKwIwFH0r3exhg0bQrG1iXlzt68AAdAPyryzXpNJ0bxJZaZpkRZkkM9xcHJBfHEak9lGfqcmvQrm+N14WLwfNPakTpjqyj7w/Ik/hTZMfM6RPCVr4hs2ntJVhvojyMY+n1BqXw/q82mXrQXsZjdD5c6f8AswrnNF8R5WK5trjy5SOoPX/H6Vt6hqcGsok7qIb2MY3r92Ueh9KqLFKL2ex2erTQTWio7KYLgYSUdFbt+BrzDxBCFcbxgsTG2ex7Vs22qsbGSymbMTDK5/hbtXPeI7jdpzuW+YFTn3BreNRp3Rzulo0x+t6zFF4VsL8xxyiwkjs7mKRAUeKUfLkHsHUj2ya4vxb4AtdS08654ahYW+4LPaFstAx6EHuh/Sp7O5tdevNc8P3l2bSC+gt0ilxkRyB96sR6ZOD7GtXQtUufDOotpet2oAX/AEa7iYblkQ8H6gg5B+lfR0KnPG1v66/ifG1qUsPUbg9Vv6dH9x5Jb+Gb+5vxaRwHzD3dgigepY4A/OtmbwFJYpm81vSbdv7hnZj/AOOqa9J8X+GtIube5tbG2ewuIThJbZyYHUjKlkPAyCOmPx6V4dqkV9Z3strcl1ljOCu7g+hHtTlKnT1sbUZ1q+0krb6HYaHcto11JbG8tNQsZ12TxJLw6/8AAgOR2NYPijQG02+ZoMy2j/NHKBwQexPrXNMSe9XdP17UtKbNvcsY/wCKJ/nRvqp4pyzClUh7OpH5noRoTi+ZO5Sli2ryKq7ea7eC10zxnEU09U0/WVGfsmcRXP8A1zJ+63+z0PbFcjdW728zRujI6EhgwwQR2NcFeirc0HdHRSq8zcXoyrIWZiWJJPcmojUpBbn0qNhzxXnSR1Ib2NbXhQ41b/gJrGx8p+lbPhXjVSf9k1lJGiKesf6y2P8A0wSqP8C/571e1f79r/1wSqP8K/570ojAVKtRgc1PEu5hXTSjd2LitTqfBthC97JqF2oNpYIZ5AejEfdX8TirOgr/AMJT4/sob470vbtFlHqrNgj8uKL1v7H8DWtqvyzai5nk9di8KPzyaxfD2qvpHiCz1BOWtpklA9cEH+lfTSkqKhQ+89JtQ5YfedFrF3o+l+IjbpodlFbPMyb7hmYRbeDwB079DXF629rNrU505VEDHgRghT6kA9BXffEDR4jrM9/Gom0u8Iu4pPRZD1GPTofpXMjT7K2mSLiKOU7fOJyOehz6Zrw8VhW6rktERiKLc32NGw8P6dbeGLS+vrGaWG54eZW2SwNnhlHIZSOxH4ipbq2tbWzk/s3U3vUClzBsG4J6gZ5A78ZHpjmtfxtaTwmztc+XaRRgRKp5YgYz7elcrDYSNdKbfiUfdJJGPx6itcfTp0n7NR2S1LxMYU3yRW1tTUM9xqOlWQtWM0pcGMjggjhlPpjr9MGuxjXULeGOWJUuL/yxE03AIXPT3rn/AA1a3NpBqulrAyX88PmQ7iCgCkNIwb3VP0xWxpF7etEu/wAvAHB7148oaXRzI6B4o9T0prbUdPZCnzxzKvMT9mBH6g9azrPW5dInERZZcdAhyD/u+o/lWvZahcQsGRwrDuKqeJbM67AXe0s3uevmqTC5+pUYP41hYq9jmLjVW0XUTc2DhrOdt3lHkIe49h6Gtqx8YwZzHL5GeWik5XP+ye30rzHVL7UNMuXjmCXIXg+b8x/76GCfxzVewkutVnVYNsBY4PVgPwp2Mvaa2PcIPE0FyAyMOODg1W1zVVk01xuHrxXP6b8MPFfnYt5LSWZedqSEZHr0xirt14a1y1hMGpWzRZ+Vih3YHr7U1oVe5V8HaDcalf3OrzKRFjy4yejEYz/n2rtdftz4h8Hy3bgDUdHAVm7yQHgZ/wB0/oTXV+HI9M/4QySxgjWL7PFvjPc4H+PX61xlrq0SeKZ9MJAgvrSeGRT/ANc2x/49gV6eDrOMrHi5jQThzrdGb4W8VStPILgedHFGkLhudy4IH4jArn/ilHY31ta6paR7JY8RygDGVbp+Rx+ZrD8OaoIpLiRjgSHj8P8A9Zo8S6ms2gTJnhtuP++hilVruUmXQwsIQTS6HGS4zkd6hJqKSbAU54zSu2FzWLlc0UbCrI8EySxMUdDuVgcEEd66rWLuLxZpP9sKqpqVuAt6q/8ALUdBL9ezfUH1rknPKjuTUtjezafeedCcYyrDsyngj8q3w9dQbjL4X/VzKtS5rTj8S/qxHJxxUe4oGGB8wxyK1xDp+oqFhm+zXfTZIf3b/Q/wn68VnXVpNazmGeNo3HUGnWpOPvLVd0VCopPlejKozhvpWv4Z41Fv9w1lheG+lafh4Y1Bv901xyidCZW1j79r/wBe6VSx8q/571c1b79r/wBe6VT6KtTEskC5Gau6bbtc3sUSjLOwUfiaooa7H4dWC3/jHT42GVWTzG+ijd/SvXwUFOojqoQ55pEXjmcHxBJaof3doq26/RRg/rmsCyga5u44kGWdgoHuasa1cG51a5mPJkkZvzNR6VcG11O3nAz5Uivj6HNdVefPide5pUlzVde56h4ruGt9Pn8OxoqWmnSJapKB8zYX94P++lLfjXmd1aNFG3kyPGrdV3HmvUPiJ5SX0pgH3ridnOOSzCM8/wDfVeeXnMYrgzCpzTVuhri5Xdux0vhbWovE+gDwzfyCPVrXmwmJ/wCPlf8Ankf9r+6e/T604IkSYxybo5FJBxwQfSuNW1kmuDJHkCMFy44245zmuntPEdrrCqmtyNbXwGBqCLuEnp5qjkn/AG159QetZRqyqQUZ9Nmcarc3uyeqN5rubR5LXVrG9D3dm+9IpUBBHcHnkEcEehq/qqLBa2mu6YyDTtQyRECW+zuPvRk44weme1ctdNd26srRrcw4yJYWEqMPXI/rVTSNeksJLizlgmudNuz+9gjOHRugkQ9mHvwRwfbD4XyyHzW3O1tdYkAG4rn2qe61UvblDIVU9cHmuU+x3nzPpdzDqUGeBG4WZfZoidwP0yPQmqF3c6hDlZ7eWA9/NUrj86wdN32DnstSDX5EuLg7fvf54qXwmgikuhF81xZhbgr6x9H/ACyp+maw5bxg7HcJZO23kA+pNSaBqU2ha3a6qi+cUf8AeRt0kRgQ6n2Kkj8aEktzJS9659L+DPES20VrcD940CiGX/cP3T+Qx9V966PxRNE13HeRN5kU6qM9fb/CvFrDU18PahG1vI1xp11H5ltITjzYWP3SezKRg+jLXUy+K4H0qSH7Ruj2loj059PY+oqJJx0Z0K17mpI0ug3LuoLWcg+Vuwz2rzWx+2XHj9tXkRn07Tp4/PX1VmJwPwBr17w40GuaQbS4CMXQEBuevb8sVyWuWsPhG4u7Z4jHaakAjMDwjjO0/SqpS5JKRjXp+1g4Hk/iK2fw7r99pqOWSCVkRv7ydVb8VINYWqak00IhB4OD+Art/Hc1vqFpZ65GmW8tbS7UDOJ4xgH6MgBH+63pXmc8jSys7dT+lbVo2lddTiw824WluhpbIxUqy72QHgDrUFFY3N7Fs48zeWGO1Lwc4qoP5VIs2BhlB9xVKRNiRlwcitSw1BbuFdM1CQCFnGy4ZdzQep9SvqKyd+RkHNNzkk1rCq4PQznTU1ZnQal4Z1DSr9rKaHexAZHj+ZJFPRlI6g0+w026sbktPbyRZXILoRn867/wr4kudOsYbVr2S2R4x5U6n5oGIH5qT1H4jmszxN4m12/gltru9kkjRxkNLuUnnkA/4V6Xs6U6TmjzPbV4VfZSS9Tz3V/9Za/9e6VRyQoGeo5/Or+sf621/wCvdKpBCyrgEnBryIq57Y6PGRXofwqQDxJPICMxWVw/0xE1edrwa7DwHqJ0/V5mU48y1mjPvlCK9rLdanL3O3B/xEjnbsf6Q+fWur+HWiw3ury6leKDZaXH9pkBGQ7A4RPxbH4A1ylwweY49a7nw1cC1+Ht+yHDyX8CuR/dCSkfrW6SdWUn0NKUU6t3sUfEGt3c5uWuHaYzyeYX77+Mn8cfoKwWuPtW1UwxPoa276DzbPOOprC+wxsA6oPMP3j6V4VWbnO7OavJybZqa6sWk+FdOs7TZI19vlubpeQ5VgPLU/3QQMnuR6Vyua6rW/Lk8DaQQMPb3VxCfcFY2/qa5Wt57qx5eGVou+93+ZYtb65sZhLa3EtvIP4onKn8xXSaX8QNXtVlgvrq4vrOddkiNMyOv+0jjkEfiD3FcmaTNJTcTpTa2N1bLRJpfMTU1VSc4uonD/jtDA/UGrd/pOkwlHgSeWMjJlhUSxZ9mJB/AjIrmM1NBdTWzboZXjJ6lGIz+VKPJs0LmZrHSZpkJghK23TzAAf1HA/Oq8+mpHEyq4eVeNobdj3OOBUMurXtwQZrqWUDjDsWH5GpYtXlhTEcUKvjG8INwrT2dF7MxlOf9f1+hqaZq8+l6eNP1a2N1pcr7kjUlJIXxy8bHv0yDwe/ODUuye4uoYdL1D7QlxKkTRupSRQx2jcp4PXqpNYsWpyxyeYVjkk7NIgY/rXT+Ari9v8AxvazyXDMIkklYYAUhULDgD1UflTVGEtL3NaVWbmoyWh7F4UgNlPaRb8gOAzA9cHH9Kn+LjW0ui3gYA+Wo5/2utVdGnEccR6hV4rjPirrU89sbOIlpGRnJH6k15stG0ehNa3H202kP4N0rT5FE8etWJjnIUAxyoC6SA+oYfkSK8RlxuOK9itNEjhv9J0mZiqBjGpHVWeJl/8AQmryC4ieCZo5F+ZCVYHsRW924I85pKq15IgoqVZQvWJCKcBDM2ADGx/EVCgnsy723RDRUkltJGM4DL/eU5FRVLTjoxpp7C5xUkCGadIx1cgZqKtGysZCvmblVj0BPIqblJXOjN21vGqSkPGBgMtU726E8BO8kggde1ZbQ3bTGKNlkOOgbrS+W8EZWdHRz601JpWQSSbvYTWRh7Q+tulVba5ltJo5oHKSJyCKva2uBZH1tk/rWZ2Faxbi7oNmOzuJbjJNbXho41m3B6M2w/jx/WsmH5TmrljM1vdRyJwVYHNepgXyVY1H3Omg+WakxLqJre9ljbqrFT+ddT4VjluvDHiGBcbIYYrkZP8AEr44/wCAs1Y2vxf8TJ5l+7N+8GPetjwdIU0zW0Xlvs8cmPUCVAR+TGuyrT9nVnD1OhR5ariTxyCXS2HuDWdGirG/uxqWHfFavHznOBn+dT6RYLfajsuGMVhADLcy/wB2NRlvxI4HuRXgwjzTscNeahFyZR8WBbTT9HsATv8AJa8kHo0p+Uf98Ih/GuYI4zWhrmqSa1rd1qEihPOfKoOiKOFUewUAfhWeeOK6J6ts5aMXGCTG0UUHIrFlhQDSEYAOc5/SlWhCFFOpucUvJqiWPFd38KwsniwQHG6a2uI1+phfH61wQNbvhPWX0LxJY6ig3G2mWTb/AHgDyPxrooStIzb5Wpdj2DSL7dbKQRuArMudHGpeHdc1Sb5pHdLWIdxnkn88Cq0t5HYeIZbWBi9u7GSBsfejbDKf++SP1rqtBjDeH7qNwGxcrKR7Dn+leZWXLNo9e/MjlfEtw0eqafdRkhkKz8cfdGR+uK4HxxFHb+N9Yt/KRo0u5NvGCAWJHI+tdfrExkgA6sIUhX/eY9PyH61xHjGcXPjXWJQcg3coB9gxH9K6qE2oNHmYiK9sn5GIYYW6Bk+hzUilI02xJtz1Y8k0zHNPCHbmtIrW6RL8x3mM2M4/AAVPbWKXcoQqoJPXH+FQhDkECtbRU8zU7dcDlwCfxrto0lOajPU560uSDlE1vE3guz8KzwRib7W8sCSsJBtMZYZwCDXLTeVvA8sxr32tk/rXWeL9QfU9buZ2f5Q21c+gGB+grk7hhuOBXRisPTpu0YpWOXAVKsqalUbbYRJ5LeZbzxse244YfnTp7u5uP3cxRsAn5cf0qntJzVrT+Ljkdq8qUYJNqNj1E3tcteIFxFppx1tE/rWOU+UV0fiW3IsNJk7NaJ/WufwePSkqdlqdDWoz7vSrMEhUAHoaRYt+O1WUtCwGOa66NKad4msE76F6VlubJSPmeP5efStnwPAy3+oIRu3WMox/eOBgfnisa1tniXDA5PUe1b0dtJZaLe3sQnMrBII2t5ljILHJ65J4XGB6ivYnFzj7SW6R2Slyr2suhP8AZgdJE5+8Tt4qPXrg6P4Fh03bsu9SuXmmPcRIQqr9C4J/4CKrlnsdPtrb+0Ly1mkbd5GpW+Iz7iQc/oB71T8b3l1feI5GuoI7Z40VBDHIJETjJww4IJYn8a8WnQcOZs8CpXjiqkVHbf7tjmMd6QnJqZkO2mGJiOlTKm1ojvcWiMjim1IRj5aQpisJRMmhg60v0pcU4D86lRJGAetOyMcUuMUgBzTtYkBUiEqwIpMbulPVDnpVxi76ENnfeH3fVdEidxuubCaOFH7+U+84P+6QT/wL2r0bRpBHo1/KrDld3PQcV5n4KmMWk60gzkQJIPb94Fz+TmvQtKH2rR7vyx+7jQO/px/9cj8qyxqXMn1Z34Z3po4aSUf2ho0TZ2vcm7fPXYh7/gteezStcXEkz8vIxc/UnNdnqczDUGmznytKyPYyZX/2euQ8k56U6EG4HHWkvasiCkjIFTRL8vzcU9V24+WpWhd03BQBmu+lT6oxchYoyw2AA+9aul2rRq0wIDR9Pc1Rto3C8HkGrbPIm0gEnvjpXt4anBLnkjkrXmuVMinWSS4ZHyAfxrNurRoskgj61ul2ERlK/Nj8qzZBNcxnGCRycmnicPFxs7tvYKUuX0M5NgVu5A/rUlshWQsalitymSUY8cYFStEUycYBFeTVoP2Lk+iOmNRc6Rva5Es/gTSbsDd5ReBsdipxXHBkPriu90EDVfAep2a4LQut3GvXCsvzfqD+VcWV2SlGYL2+laxpKdCnUXVW+aPbnS9yM+6JLCymv7lILWKSaVuiIpJrutP8CpBtF/qYhmxueGJPMMf+8cgCsPTvFF9p1hBZwWds0OcPJAQk7/7Jbr+P5VV1fxdqs5a3tbM6fb/xRISSfct1J9+tROt9XXuR19NDSKp0lzO7Z6Dd2/hvS4VJhhJ4UGeZix9WOMDJ9AMD1NZ1/Z6R4iCQ2mmoREC5aFSAv1Y9foK4bwvqkNprxutT0l9ViSM7YS5+RuMN17VZ1Lxzrkkrpb7rSEjG1eMivNrYyvUupvQJ4jmjrsbeqaXqekWaPC7X2nW53SWV0d8ajIzgHp+GD71TudItHkecnywxJ2K+QuewJ5IFc5N4i1W5QJPM7RcAqxOCM9K1nvbq4tt2YXTGf3amvcyqdJxkqibem/zPMw6hTquTitewsthp6nImBx/tf/WrPmht8cSqPxP+FV57m5JOQQPYVUaeToSarEYulsoWPTnWi1ZRsTPHEDxIp/E/4VEQg/iBqMyk0gfPYV5E6kW9EcUmnsSfLQCvp+tR59hRz6Vk2YMlwPUfnRtHrTFyTWhp2lX+pzeVZWstw46iNc4qlr0MmVFTmpkHauz0j4bavdt/puLNf4Vx5kjH02r0/Eit6L4UCOUQ3F5NJM33Ut4wTn9T+lVeEN2X7CrJXscZa2ynwtfTtYXtyTNFEHt22hOGJDHaeDgccdqsabc6RbafNGNQ13RpmXGVIlRvZgCpx+ddlJ8L4ZYEjXVru1jjJcqHUc9yc45496y9e03xHoeiskOqw65pGcrHdxBmP03A/oRntWc8RRlKz/I56mFrx1h+f9I5aW31H7BPefa7bUbJ1jgaeN8NEFOVVk4YZx1I7dazlEXdl/GmS3mlz2gktrSa0vt5EqB90JXttB5Bz2JIqi0/PStqdSFOOmxioTl8e/8AXyNhEtCMtKh9uf8ACrUMlggwzkj2rm/tWP4RSm7b0xXXDHxg7qKJeHk+rOnNxZhMRq+PXilSa1YbCzL9RXMJctnhj9M1PHdSZA2hvqK7aea3eqRDwzj1OgkuLRf3bMSvsar7rFMspY+o3Yz+lZklwxXAVCPp0qlJOxPTn2rSrmiWvKgjQcludFJqlmvl4gYBf4S1Vbu7t3sppI0KkDgE1iGdiMVJM5Fjt/vn+XNefic2nVpyg7Wa7GtLCKEk0dL8Odbt9N1iIXjBbVs29wT0ETnhz7K+CfZjTfHPhy40DXp4HQqoYlfpXI2d01ndLKFDjkMh6Mp4IP1Few6VdWvj3wtFo1y+7V7KH/Qpm+9dwKPu/wDXRBwR3Az2rhy+vFp4ao7KWz7P/gn0OHmpx9hPrt6/8E8njmkBHAJHI4rpdAunnv4xMdu44Zj0x71j6jptxpl68ciFGU45FaHh+WX7ehjm8tsjqxH5V7OBU6VdQmb4fmp1eVmh4hkFlqLCKFTjowHUVjpM14khEaDYM8g8Vc8SLcNqDkzZyc8setReHYJri4ljEp2eWScMQK6q8XUxfs5LQeLlJzlEg1exih0+3lW6WRnBJRUIK/XiseO5lRNiyso9Aa2dXvLmS3WB5mKR8Bc8CsFlPU8/jXj5haFW9PTT+up4VCE4L3yRp5G6uab5hDAnn61Bk0bjXkOs3udXMyUnOabuHpTdvyBtwyTjHcUDNTzMhjt/tShzmm5x3oEmKFLuyWjovDNjo97NLJrOqmyhhxiNE3PMT2B6D6161GumeH9PtrR0hEFyR5FnZOJJrgnpvYZ59Rn8e1eEJMgjZWjVsnIJ6ipvMjEkbxyyoycg7+V+hp1JNqyZvTkoLRanu+o62mgSvceJZX01Sv7rSrZ/mY46uwPXnp0qCy8Q6nbaU2o6w3/COaW4YwxrEBc3HpyeQMdz1rxO8M99MJ5LyW4cdGkfJFT6ndahrG1rvULi7MagDznzgVyuLLdVnol38XbaaMQwWoQ5DNK7b2fHQEnt7dKyfEXxJfVbV4VwN/5D6CuB+wsBz+lNa22jpTUGZOs+o5rgPI7jA3nOMUwyE9KURFEyRxTMD1rovJJI59G7gWb0pMn0ox6Ggk4A9Kh+YwBYVIjNkfNiovmp6Eg9aqL1Bonbdt4b64qBiw71K78AVDguaupLsRFD4ELvzUl2/wC6z6/Iv4dT/KnxJtG3O3jLN/dHrVO4lEsuVBCKMKD2Fc0n0NkiOr+l6rLp06FXkVVcSK0bbXicdHQ9iP1qhRUjPX01rRvHFmkOtSwWOrsMR3wG2C6P+1/zzf1HQ+3Sua1Dwjqej3+wwsQDwR0Yexri7e6ltWJjYbW4ZGGVYe4rqdH8e3+mwLbpNm2X/l2uAZYh/un7y/QGvZwuZKNo11e2z6r/ADO+niYysq33lPUmfzSkq8jj5gcj8at+H5Xt2m2bWDoVORj9a1Z/E2j6qM3mlvG/d7aQSD8jg0WS6A27yr6W33dpLZz/AOgg168MVQdb2yqL8n+JteDnzKSf4fmcvfAh2B9azmHbGa7C90rSWOU1ZGz/ANO8o/mtZcmnWiH5LnzPcRP/AFFeZiHGc3JSX3o4509d196MDyx34pNqetaz2MXZpD/2zNQmxTssh/4Aa82XKtrGLVjO2ikx7VofYgOkcv8A3waT7F/0zl/75rJtE2M/FGK0DYH/AJ5y/wDfFH2Bsf6qX/vk1F0IzxTvzq79hI/5Zy/980v2E/8APOX/AL5NNSQrFMOy9GqRJnzktVj7E3/POX/vg0CyYf8ALGX/AL5pqSFqPhYSL8zDPpV8Wu63LAqfbPNVoU8lSDbynP8As1YFwFTC2swJ77a9ClVpJe8zjrU6jfukN5bolirbCGz1JH8qx2Fa8hMkZUwTZ/3aqGzY9IpR/wABrCvUhJrlNKMJRXvFA5oq99hk/wCeUn/fNN+wyf8APKT/AL5rkujosVQTShqsfY2QZZWAHqKP3Sdif0/nT5gsRLEzngGpkQKSFxkfeY/dT61G92MYHT+6vH61XklaQAHAUdFHQVLlcaRNc3Ksnkw5Eecsx+9IfU+3oKrUUVIz/9k=";
+document.getElementById('brandLogoImg').src=BRAND_LOGO;
+document.getElementById('brandLogoImgContact').src=BRAND_LOGO;
+document.getElementById('brandLogoImgAv').src=BRAND_LOGO;
+
+const TUTORIALS={
+  'Push Ups':'https://www.youtube.com/watch?v=IODxDxX7oi4',
+  'Incline Push Ups':'https://www.youtube.com/watch?v=cfns5XxMxnM',
+  'Diamond Push Ups':'https://www.youtube.com/watch?v=J0DXe9oralph',
+  'Wide Push Ups':'https://www.youtube.com/watch?v=8armJGsrH4U',
+  'Pike Push Ups':'https://www.youtube.com/watch?v=sposDXWEB0A',
+  'Bench Dips':'https://www.youtube.com/watch?v=6kALZikXxLc',
+  'Squats':'https://www.youtube.com/watch?v=aclHkVaku9U',
+  'Jump Squats':'https://www.youtube.com/watch?v=Azl5tkCzDcc',
+  'Bulgarian Split Squats':'https://www.youtube.com/watch?v=2C-uNgKwPLE',
+  'Wall Sit':'https://www.youtube.com/watch?v=y-wV4Venusic',
+  'Lunges':'https://www.youtube.com/watch?v=QOVaHwm-Q6U',
+  'Calf Raises':'https://www.youtube.com/watch?v=gwLzBJYoWlI',
+  'Burpees':'https://www.youtube.com/watch?v=TU8QYVW0gDU',
+  'Mountain Climbers':'https://www.youtube.com/watch?v=nmwgirgXLYM',
+  'Plank':'https://www.youtube.com/watch?v=pSHjTRCQxIw',
+  'Side Plank':'https://www.youtube.com/watch?v=K2iECBp39tw',
+  'Russian Twist':'https://www.youtube.com/watch?v=wkD8rjkodUI',
+  'Crunches':'https://www.youtube.com/watch?v=Xyd_fa5zoEU',
+  'Leg Raises':'https://www.youtube.com/watch?v=JB2oyawG9KI',
+  'Superman Hold':'https://www.youtube.com/watch?v=z6PJMT2y8GQ',
+  'Jumping Jacks':'https://www.youtube.com/watch?v=iSSAk4XCsRA',
+  'High Knees':'https://www.youtube.com/watch?v=tx5rgpDAJRI',
+  'Shoulder Taps':'https://www.youtube.com/watch?v=74WoiH-b_Cw',
+  'Bear Crawl':'https://www.youtube.com/watch?v=kWOAmGSC5fs',
+  'Glute Bridge':'https://www.youtube.com/watch?v=wPM8icPu6H8',
+  'Hip Thrust':'https://www.youtube.com/watch?v=xDmFkJxPzeM',
+  'Inchworm':'https://www.youtube.com/watch?v=Xi8BIm0HKhk',
+  'Tricep Dips':'https://www.youtube.com/watch?v=6kALZikXxLc',
+};
+
+const EX=[
+  {n:'Push Ups',m:'Chest',c:8,t:'Keep elbows at 45°. Squeeze chest at the top.',minW:0},
+  {n:'Incline Push Ups',m:'Upper Chest',c:7,t:'Hands elevated. Drive through upper chest fibers.',minW:0},
+  {n:'Diamond Push Ups',m:'Triceps',c:9,t:'Hands close in diamond shape. Feel the tricep burn.',minW:0},
+  {n:'Wide Push Ups',m:'Outer Chest',c:8,t:'Wide grip targets outer chest. Go slow on descent.',minW:0},
+  {n:'Pike Push Ups',m:'Shoulders',c:8,t:'Hips high, lower head toward ground. Shoulder builder.',minW:0},
+  {n:'Bench Dips',m:'Triceps',c:9,t:'Body close to bench. Full range of motion each rep.',minW:0},
+  {n:'Squats',m:'Quads / Glutes',c:10,t:'Chest up, knees track toes. Go below parallel.',minW:0},
+  {n:'Jump Squats',m:'Full Legs',c:14,t:'Explode upward. Land soft — protect your joints.',minW:40},
+  {n:'Bulgarian Split Squats',m:'Glutes / Quads',c:12,t:'Rear foot elevated. Front leg does the work.',minW:50},
+  {n:'Wall Sit',m:'Quads',c:6,t:'90° knee angle. Press back flat into wall. Hold strong.',minW:0},
+  {n:'Lunges',m:'Legs',c:10,t:'Step forward, knee above ankle. Drive back through heel.',minW:40},
+  {n:'Calf Raises',m:'Calves',c:5,t:'Full range — all the way up, hold, lower slowly.',minW:0},
+  {n:'Burpees',m:'Full Body',c:16,t:'Explosive. Link reps smoothly. This is the destroyer move.',minW:50},
+  {n:'Mountain Climbers',m:'Core / Cardio',c:12,t:'Hips level. Drive knees fast. Keep breathing.',minW:30},
+  {n:'Plank',m:'Core',c:5,t:'Squeeze glutes, brace abs. Don\'t let hips sag.',minW:0},
+  {n:'Side Plank',m:'Obliques',c:5,t:'Stack or stagger feet. Hold and breathe steadily.',minW:0},
+  {n:'Russian Twist',m:'Obliques',c:7,t:'Lean back 45°. Rotate from the torso, not the arms.',minW:40},
+  {n:'Crunches',m:'Abs',c:6,t:'Don\'t pull your neck. Curl using abs only.',minW:0},
+  {n:'Leg Raises',m:'Lower Abs',c:8,t:'Keep legs straight. Control the descent fully.',minW:40},
+  {n:'Superman Hold',m:'Lower Back',c:5,t:'Lift arms and legs simultaneously. Squeeze glutes hard.',minW:0},
+  {n:'Jumping Jacks',m:'Cardio',c:10,t:'Maintain rhythm. Great warm-up or finisher.',minW:0},
+  {n:'High Knees',m:'Cardio / Core',c:13,t:'Drive knees to hip height. Pump arms aggressively.',minW:30},
+  {n:'Shoulder Taps',m:'Core / Shoulders',c:7,t:'Tap opposite shoulder without rotating hips.',minW:0},
+  {n:'Bear Crawl',m:'Full Body',c:11,t:'Stay low. Move opposite arm and leg simultaneously.',minW:40},
+  {n:'Glute Bridge',m:'Glutes',c:7,t:'Press through heels. Hold 2 sec at the top. Squeeze.',minW:0},
+  {n:'Hip Thrust',m:'Glutes',c:9,t:'Full hip extension at top. Maximum glute contraction.',minW:50},
+  {n:'Inchworm',m:'Full Body',c:8,t:'Walk hands to plank, then walk feet back in. Controlled.',minW:30},
+  {n:'Tricep Dips',m:'Triceps',c:9,t:'Elbows track backward. Slow controlled descent.',minW:0},
+];
+
+const QUOTES=[
+  {q:"We train to destroy.",a:"— Xd exercise"},
+  {q:"Pain is just weakness leaving your body.",a:"— Xd exercise"},
+  {q:"The iron never lies to you.",a:"— Henry Rollins"},
+  {q:"You don't get what you wish for. You get what you work for.",a:"— Xd exercise"},
+  {q:"Your body can stand almost anything. It's your mind you have to convince.",a:"— Xd exercise"},
+  {q:"Be the hardest worker in the room. Every. Single. Day.",a:"— Xd exercise"},
+  {q:"Sweat is just fat crying.",a:"— Xd exercise"},
+  {q:"Excuses don't build muscle. Reps do.",a:"— Xd exercise"},
+  {q:"Champions aren't born. They're built — rep by rep.",a:"— Xd exercise"},
+  {q:"Destroy your limits. Then set new ones.",a:"— Xd exercise"},
+  {q:"Your future self is watching. Don't disappoint him.",a:"— Xd exercise"},
+  {q:"Weak people quit. Destroyers push one more rep.",a:"— Xd exercise"},
+  {q:"Nobody remembers the guy who almost made it.",a:"— Xd exercise"},
+  {q:"Suffer now. Conquer forever.",a:"— Xd exercise"},
+  {q:"Build a body they'll stare at and a mind they'll fear.",a:"— Xd exercise"},
+  {q:"Real Destroyers don't skip. Not legs. Not days.",a:"— Xd exercise"},
+  {q:"Go hard or go home. The Destroyer always goes hard.",a:"— Xd exercise"},
+  {q:"Iron sharpens iron. And it sharpens you.",a:"— Xd exercise"},
+];
+
+let UD={},wData=[],compMap={},selGoalV='',selLearnV='',selLevelV='';
+let hpCm=170,hpUnit='cm';
+let isDragging=false,dragStartY=0,dragStartCm=170;
+
+function init(){
+  const s=G.get('user');
+  if(s&&s.fn){UD=s;launchApp();}
+  else{setTimeout(()=>showOnly('onboard'),2500);}
+}
+function showOnly(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function toS2(){
+  const fn=document.getElementById('fn').value.trim();
+  const wt=document.getElementById('wt').value;
+  const ht=UD.ht;
+  if(!fn||!document.getElementById('age').value||!wt){alert('Please fill all fields!');return;}
+  if(!ht){alert('Please pick your height!');return;}
+  UD.fn=fn;UD.ln=document.getElementById('ln').value.trim();
+  UD.age=document.getElementById('age').value;UD.gen=document.getElementById('gen').value;UD.wt=wt;
+  document.getElementById('s1').style.display='none';document.getElementById('s2').style.display='flex';
+}
+function selGoal(el,v){document.querySelectorAll('#s2 .oc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');selGoalV=v;}
+function toS3(){if(!selGoalV){alert('Please select your goal!');return;}UD.goal=selGoalV;document.getElementById('s2').style.display='none';document.getElementById('s3').style.display='flex';}
+function selLearn(el,v){document.querySelectorAll('.lo').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');selLearnV=v;}
+function toS4(){if(!selLearnV){alert('Please make a selection!');return;}UD.learn=selLearnV;document.getElementById('s3').style.display='none';document.getElementById('s4').style.display='flex';}
+function selLevel(el,v){document.querySelectorAll('#s4 .oc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');selLevelV=v;}
+
+function finishOnboard(){
+  if(!selLevelV){alert('Please select your fitness level!');return;}
+  UD.level=selLevelV;
+  UD.goalDesc=document.getElementById('goalDesc').value;
+  UD.maxPush=document.getElementById('maxPush').value||'?';
+  UD.maxSquat=document.getElementById('maxSquat').value||'?';
+  UD.joinDate=new Date().toISOString();
+  G.set('user',UD);G.set('streak',0);G.set('total',0);
+  showOnly('aiLoad');
+  runAiLoader();
+}
+
+function runAiLoader(){
+  const steps=[{id:'als1',pct:20},{id:'als2',pct:45},{id:'als3',pct:65},{id:'als4',pct:85},{id:'als5',pct:100}];
+  let i=0;
+  const circle=document.getElementById('alCircle');
+  const circ=314.2;
+  function next(){
+    if(i>0){const prev=document.getElementById(steps[i-1].id);prev.classList.remove('active');prev.classList.add('done');prev.querySelector('.al-check').textContent='✓';}
+    if(i<steps.length){
+      const st=document.getElementById(steps[i].id);
+      st.classList.add('active');
+      const pct=steps[i].pct;
+      document.getElementById('alPct').textContent=pct+'%';
+      circle.style.strokeDashoffset=circ-(pct/100)*circ;
+      i++;
+      setTimeout(next,i===steps.length?600:700);
+    } else {
+      document.getElementById('alCircle').style.strokeDashoffset=0;
+      setTimeout(()=>launchApp(),400);
+    }
+  }
+  setTimeout(next,400);
+}
+
+/* HEIGHT PICKER */
+function openHeightPicker(){showOnly('heightPick');buildRuler();updateRulerPos();}
+function closeHeightPicker(){showOnly('onboard');}
+function setUnit(u){
+  hpUnit=u;
+  document.getElementById('tab-cm').classList.toggle('on',u==='cm');
+  document.getElementById('tab-ft').classList.toggle('on',u==='ft');
+  document.getElementById('hpUnit').textContent=u;
+  updateHpDisplay();
+}
+function updateHpDisplay(){
+  if(hpUnit==='cm'){document.getElementById('hpVal').textContent=Math.round(hpCm);}
+  else{const tot=hpCm/30.48;const ft=Math.floor(tot);const inch=Math.round((tot-ft)*12);document.getElementById('hpVal').textContent=ft+"'"+inch;}
+}
+function buildRuler(){
+  const inner=document.getElementById('rulerInner');
+  inner.innerHTML='';
+  const area=document.getElementById('rulerArea');
+  const h=area.offsetHeight||200;
+  const totalH=h*3;
+  inner.style.height=totalH+'px';
+  for(let cm=120;cm<=220;cm++){
+    const isMajor=cm%10===0;const isMid=cm%5===0;
+    const line=document.createElement('div');
+    line.className='ruler-line';
+    const pct=(cm-120)/(220-120);
+    const y=pct*(totalH-h)+h/2;
+    line.style.top=y+'px';
+    line.style.width=isMajor?'40px':isMid?'25px':'15px';
+    line.style.background=isMajor?'rgba(0,229,255,.6)':'rgba(255,255,255,.2)';
+    inner.appendChild(line);
+    if(isMajor){
+      const lbl=document.createElement('div');
+      lbl.className='ruler-label';
+      lbl.style.top=y+'px';
+      lbl.textContent=cm;
+      inner.appendChild(lbl);
+    }
+  }
+}
+function updateRulerPos(){
+  const area=document.getElementById('rulerArea');
+  const h=area.offsetHeight||200;
+  const totalH=h*3;
+  const pct=(hpCm-120)/(220-120);
+  const y=pct*(totalH-h);
+  document.getElementById('rulerInner').style.top=(-y)+'px';
+  updateHpDisplay();
+}
+const rulerArea=document.getElementById('rulerArea');
+rulerArea.addEventListener('mousedown',e=>{isDragging=true;dragStartY=e.clientY;dragStartCm=hpCm;});
+rulerArea.addEventListener('touchstart',e=>{isDragging=true;dragStartY=e.touches[0].clientY;dragStartCm=hpCm;},{passive:true});
+document.addEventListener('mousemove',e=>{if(!isDragging)return;const dy=dragStartY-e.clientY;hpCm=Math.max(120,Math.min(220,dragStartCm+dy/3));updateRulerPos();});
+document.addEventListener('touchmove',e=>{if(!isDragging)return;const dy=dragStartY-e.touches[0].clientY;hpCm=Math.max(120,Math.min(220,dragStartCm+dy/3));updateRulerPos();},{passive:true});
+document.addEventListener('mouseup',()=>isDragging=false);
+document.addEventListener('touchend',()=>isDragging=false);
+
+function confirmHeight(){
+  UD.ht=Math.round(hpCm);
+  const el=document.getElementById('htDisplay');
+  el.textContent=Math.round(hpCm)+' cm';
+  el.style.color='#00e5ff';
+  closeHeightPicker();
+}
+
+function launchApp(){
+  showOnly('home');
+  setDailyQuote();
+  refreshHomeUI();
+  buildWorkout();
+  loadAv();
+}
+
+function setDailyQuote(){
+  const d=Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/(86400000));
+  const q=QUOTES[d%QUOTES.length];
+  document.getElementById('qTxt').textContent=q.q;
+  document.getElementById('qAuth').textContent=q.a;
+}
+
+function refreshHomeUI(){
+  const u=G.get('user')||UD;
+  const streak=G.get('streak')||0;
+  const total=G.get('total')||0;
+  document.getElementById('hGreet').textContent=(u.fn||'DESTROYER').toUpperCase();
+  document.getElementById('hStreakBig').textContent=streak;
+  document.getElementById('hTotal').textContent=total;
+  document.getElementById('hCal').textContent=G.get('todayCal')||0;
+  const joined=u.joinDate?new Date(u.joinDate):new Date();
+  const days=Math.max(0,Math.floor((Date.now()-joined)/86400000));
+  document.getElementById('hDays').textContent=days;
+  const now=new Date();
+  document.getElementById('hDate').textContent=now.toLocaleDateString('en-US',{weekday:'short',month:'long',day:'numeric'});
+  const week=Math.floor(days/7)+1;
+  let diff=u.level||'Easy';
+  if(week>=4)diff='Advanced';else if(week>=3)diff='Hard';else if(week>=2)diff='Medium';
+  document.getElementById('diffBadge').textContent='Week '+week+' · '+diff;
+}
+
+function seededShuffle(arr,seed){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.abs(Math.sin(seed*(i+1)))*10000)%(i+1);[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function buildWorkout(){
+  const today=new Date().toDateString();
+  const saved=G.get('wDay');
+  if(saved&&saved.date===today){wData=saved.ex;compMap=G.get('comp')||{};renderWorkout();return;}
+  const u=G.get('user')||UD;
+  const wt=parseFloat(u.wt)||70;
+  const maxPush=parseInt(u.maxPush)||10;
+  const level=u.level||'Easy';
+  const joined=u.joinDate?new Date(u.joinDate):new Date();
+  const days=Math.max(0,Math.floor((Date.now()-joined)/86400000));
+  const week=Math.floor(days/7)+1;
+  const seed=new Date().getFullYear()*1000+new Date().getMonth()*31+new Date().getDate();
+
+  let baseReps=8,baseSets=3,rest=45,cnt=5;
+  if(level==='Intermediate'){baseReps=10;baseSets=3;cnt=6;}
+  else if(level==='Hard'){baseReps=12;baseSets=4;rest=30;cnt=7;}
+  else if(level==='Advanced'){baseReps=15;baseSets=4;rest=25;cnt=8;}
+  baseReps+=Math.min(week-1,4)*2;
+  if(week>2)cnt=Math.min(cnt+1,9);
+
+  const weightOk=EX.filter(e=>e.minW===0||(wt>=e.minW));
+  const shuffled=seededShuffle(weightOk,seed);
+  const pushEx=shuffled.find(e=>e.n==='Push Ups');
+  let picked=shuffled.filter(e=>e.n!=='Push Ups').slice(0,cnt-1);
+  if(pushEx)picked.unshift(pushEx);
+  while(picked.length<cnt&&shuffled.length>picked.length){
+    const extra=shuffled.find(e=>!picked.includes(e));
+    if(extra)picked.push(extra);else break;
+  }
+
+  const pushReps=Math.max(maxPush,baseReps);
+  wData=picked.map((e,i)=>({n:e.n,m:e.m,c:e.c,t:e.t,reps:e.n==='Push Ups'?pushReps:baseReps+Math.floor(Math.abs(Math.sin(seed+i))*4),sets:baseSets+(i===0?1:0),rest}));
+  G.set('wDay',{date:today,ex:wData});compMap={};G.set('comp',{});G.set('todayCal',0);
+  renderWorkout();
+}
+
+const MUSCLE_ICON={'Chest':'🫁','Upper Chest':'🫁','Triceps':'💪','Outer Chest':'🫁','Shoulders':'🏋️','Quads / Glutes':'🦵','Full Legs':'🦵','Glutes / Quads':'🦵','Quads':'🦵','Legs':'🦵','Calves':'🦵','Full Body':'🔥','Core / Cardio':'⚡','Core':'🧱','Obliques':'🧱','Lower Abs':'🧱','Abs':'🧱','Lower Back':'🦴','Cardio':'⚡','Cardio / Core':'⚡','Core / Shoulders':'🏋️','Glutes':'🍑'};
+function iconFor(m){return MUSCLE_ICON[m]||'💪';}
+
+function renderWorkout(){
+  const list=document.getElementById('wList');list.innerHTML='';
+  let totalCal=0;
+  wData.forEach((ex,i)=>{
+    const done=!!compMap[i];
+    if(done)totalCal+=ex.c*ex.sets;
+    const d=document.createElement('div');
+    d.className='wcard'+(done?' done':'');d.id='wc'+i;
+    d.onclick=()=>openExDetail(i);
+    d.innerHTML=`<div class="wc-ic">${done?'✓':iconFor(ex.m)}</div><div class="wc-mid"><div class="wc-name">${ex.n}</div><div class="wc-muscle">${ex.m}</div></div><div class="wc-right"><div><div class="wc-sets">${ex.sets}×${ex.reps}</div><div class="wc-sets-lbl">SETS×REPS</div></div><div class="wc-chev">›</div></div>`;
+    list.appendChild(d);
+  });
+  G.set('todayCal',totalCal);
+  document.getElementById('hCal').textContent=totalCal;
+  updateRing();
+}
+
+let edIndex=null;
+function openExDetail(i){
+  edIndex=i;
+  const ex=wData[i];
+  const done=!!compMap[i];
+  const tutUrl=TUTORIALS[ex.n]||'https://www.youtube.com/results?search_query='+encodeURIComponent(ex.n+' exercise tutorial');
+  document.getElementById('edIc').textContent=iconFor(ex.m);
+  document.getElementById('edName').textContent=ex.n;
+  document.getElementById('edMuscle').textContent=ex.m;
+  document.getElementById('edSets').textContent=ex.sets+'×'+ex.reps;
+  document.getElementById('edRest').textContent=ex.rest+'s';
+  document.getElementById('edCal').textContent=(ex.c*ex.sets);
+  document.getElementById('edTip').textContent=ex.t;
+  document.getElementById('edTutBtn').href=tutUrl;
+  const btn=document.getElementById('edDoneBtn');
+  btn.classList.toggle('ok',done);
+  btn.textContent=done?'✓ COMPLETED':'MARK AS DONE';
+  showOnly('exDetail');
+}
+function closeExDetail(){showOnly('home');}
+function markDoneFromDetail(){
+  if(edIndex===null)return;
+  markDone(edIndex);
+  const btn=document.getElementById('edDoneBtn');
+  btn.classList.add('ok');btn.textContent='✓ COMPLETED';
+}
+
+function markDone(i){
+  if(compMap[i])return;
+  compMap[i]=true;G.set('comp',compMap);
+  const card=document.getElementById('wc'+i);
+  card.classList.add('done');
+  card.querySelector('.wc-ic').textContent='✓';
+  let cal=0;wData.forEach((w,idx)=>{if(compMap[idx])cal+=w.c*w.sets;});
+  G.set('todayCal',cal);document.getElementById('hCal').textContent=cal;
+  updateRing();
+  if(Object.keys(compMap).length===wData.length)dayComplete();
+}
+
+function updateRing(){
+  const total=wData.length,done=Object.keys(compMap).length;
+  const pct=total?Math.round((done/total)*100):0;
+  document.getElementById('pCircle').style.strokeDashoffset=138.2-(pct/100)*138.2;
+  document.getElementById('pPct').textContent=pct+'%';
+  document.getElementById('pComp').textContent=done+'/'+total;
+}
+
+function dayComplete(){
+  const today=new Date().toDateString(),last=G.get('lastDate'),yest=new Date(Date.now()-86400000).toDateString();
+  let streak=G.get('streak')||0;
+  if(last===yest)streak++;else if(last!==today)streak=1;
+  G.set('streak',streak);G.set('lastDate',today);
+  const tot=(G.get('total')||0)+1;G.set('total',tot);
+  document.getElementById('hStreakBig').textContent=streak;document.getElementById('hTotal').textContent=tot;
+  setTimeout(()=>alert('🔥 Day Complete!\n\nStreak: '+streak+' days 🔥\nTotal Workouts: '+tot+' 💪\n\nYou are becoming the Destroyer! 💪'),300);
+}
+
+function handleAvUpload(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{G.set('avatar',ev.target.result);renderAv(ev.target.result);};
+  r.readAsDataURL(f);
+}
+function renderAv(src){const el=document.getElementById('avEl');if(src){el.innerHTML='<img src="'+src+'">';}else{el.innerHTML='<img class="brand-logo-sm" style="width:100%;height:100%;object-fit:cover" src="'+BRAND_LOGO+'">';}}
+function loadAv(){const s=G.get('avatar');if(s)renderAv(s);}
+
+function goTo(scr){
+  ['home','contact','profile'].forEach(s=>{document.getElementById(s).classList.remove('active');['','2','3'].forEach(n=>{const el=document.getElementById('n'+s[0]+n);if(el)el.classList.remove('active');});});
+  document.getElementById(scr).classList.add('active');
+  ['','2','3'].forEach(n=>{const el=document.getElementById('n'+scr[0]+n);if(el)el.classList.add('active');});
+  if(scr==='profile')refreshProfile();
+  if(scr==='home'){refreshHomeUI();updateRing();}
+}
+
+function refreshProfile(){
+  const u=G.get('user')||UD;
+  const streak=G.get('streak')||0,total=G.get('total')||0;
+  document.getElementById('pName').textContent=((u.fn||'')+' '+(u.ln||'')).trim().toUpperCase()||'DESTROYER';
+  document.getElementById('pGoal').textContent=u.goal||'Gain Muscle';
+  document.getElementById('ppStreak').textContent=streak;document.getElementById('ppTotal').textContent=total;
+  const joined=u.joinDate?new Date(u.joinDate):new Date();
+  document.getElementById('ppDays').textContent=Math.max(0,Math.floor((Date.now()-joined)/86400000));
+  document.getElementById('pAge').textContent=u.age?u.age+' years':'—';
+  document.getElementById('pHt').textContent=u.ht?u.ht+' cm':'—';
+  document.getElementById('pWt').textContent=u.wt?u.wt+' kg':'—';
+  document.getElementById('pGen').textContent=u.gen||'—';
+  document.getElementById('pLevel').textContent=u.level||'—';
+  document.getElementById('pPush').textContent=u.maxPush?u.maxPush+' reps':'—';
+  document.getElementById('pLearn').textContent=u.learn||'—';
+  let un=0;
+  [['a1',total>=1],['a7',streak>=7],['a15',streak>=15],['a30',streak>=30],['a50',total>=50],['a100',total>=100]].forEach(([id,c])=>{if(c){document.getElementById(id).classList.add('on');un++;}else document.getElementById(id).classList.remove('on');});
+  document.getElementById('achBadge').textContent=un+' Unlocked';
+  loadAv();
+}
+
+function doLogout(){if(confirm('Logout? All data will be cleared.')){localStorage.clear();location.reload();}}
+
+init();
+</script>
+</body>
+</html>
