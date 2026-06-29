@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.xd94h.exercise",
+        "sha256_cert_fingerprints": ["1B:AF:97:D2:8F:B4:DB:78:C9:49:50:B5:AC:FB:4D:B8:40:9D:25:17:BA:30:0B:75:67:68:64:6B:27:04:26:11"]
+      }
+    }]
