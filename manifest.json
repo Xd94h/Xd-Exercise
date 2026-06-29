@@ -1,0 +1,19 @@
+{
+  "background_color": "#050505",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Xd Exercise",
+  "orientation": "any",
+  "scope": "/Xd-Exercise/",
+  "short_name": "Xd Exercise",
+  "start_url": "/Xd-Exercise/",
+  "theme_color": "#050505",
+  "description": "Your personal AI fitness trainer app",
+  "id": "xd94h",
+  "icons": [
+    { "src": "/Xd-Exercise/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/Xd-Exercise/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/Xd-Exercise/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/Xd-Exercise/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
